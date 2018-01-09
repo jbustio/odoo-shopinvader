@@ -17,6 +17,7 @@
                             <field name="version" colspan="4"/>
                             <field name="location" placeholder="e.g. http://mylocomotive.akretion.com"
                                 colspan="2"/>
+                            <field name="company_id" colspan="2"/>
                             <field name="username" colspan="2"/>
                             <field name="password" colspan="2"/>
                             <field name="handle" colspan="2"/>
