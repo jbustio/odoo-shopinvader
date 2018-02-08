@@ -9,13 +9,15 @@ from odoo import api, fields, models
 class ShopinvaderProduct(models.Model):
     _name = 'shopinvader.product'
     _description = 'Shopinvader Product'
-    _inherit = ['locomotive.binding']
+    _inherit = ['locomotive.binding', 'abstract.url']
     _inherits = {'product.template': 'record_id'}
 
     record_id = fields.Many2one(
         'product.template',
         required=True,
-        ondelete='cascade')
+        ondelete='cascade',
+        index=True,
+    )
     seo_title = fields.Char()
     meta_description = fields.Char()
     meta_keywords = fields.Char()
