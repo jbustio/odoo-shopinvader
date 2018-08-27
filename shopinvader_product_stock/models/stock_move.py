@@ -52,7 +52,7 @@ class StockMove(models.Model):
         :return: stock.move recordset
         """
         result = super(StockMove, self).action_confirm()
-        self._jobify_product_stock_update()
+        result._jobify_product_stock_update()
         return result
 
     @api.multi
