@@ -29,6 +29,7 @@
         "base_url",
         "base_vat",
         "sale",
+        "sale_discount_display_amount",
         "onchange_helper",
         'queue_job',
     ],
