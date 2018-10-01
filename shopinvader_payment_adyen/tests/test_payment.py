@@ -92,6 +92,7 @@ class ShopinvaderAdyenCommonCase(AdyenCommonCase, CommonCase):
             }
 
     def _test_3d(self, card, success=True):
+        import requests.packages.urllib3
         response, transaction, source = self._create_transaction(card)
         self.assertEqual(transaction.state, 'pending')
         url, data = self._get_data_for_3d_secure(response)
@@ -104,11 +105,9 @@ class ShopinvaderAdyenCommonCase(AdyenCommonCase, CommonCase):
                 response['redirect_to'],
                 REDIRECT_URL['redirect_success_url'])
         else:
-            print('2')
             with self.assertRaises(UserError):
                 response = self.service.dispatch(
                     'check_payment', params=params)
-                print('3')
                 self.assertEqual(transaction.state, 'failed')
                 self.assertEqual(
                     response['redirect_to'],
