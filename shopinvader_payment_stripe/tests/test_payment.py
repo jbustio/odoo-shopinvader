@@ -9,7 +9,7 @@ from odoo.addons.payment_gateway_stripe.tests.test_payment import (
     StripeScenario)
 import json
 from mock import Mock
-from os.path import dirname
+from os.path import abspath, dirname
 
 
 REDIRECT_URL = {
@@ -22,7 +22,7 @@ class ShopinvaderStripeCase(StripeCommonCase, CommonCase, StripeScenario):
 
     def __init__(self, *args, **kwargs):
         super(ShopinvaderStripeCase, self).__init__(*args, **kwargs)
-        self._decorate_test(dirname(__file__))
+        self._decorate_test(abspath(dirname(__file__)))
 
     def setUp(self, *args, **kwargs):
         super(ShopinvaderStripeCase, self).setUp(*args, **kwargs)
