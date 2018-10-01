@@ -13,7 +13,7 @@ from odoo.addons.payment_gateway_adyen.tests.test_payment import (
     USER_AGENT)
 import json
 from mock import Mock
-from os.path import dirname
+from os.path import dirname, abspath
 
 
 REDIRECT_URL = {
@@ -132,4 +132,4 @@ class ShopinvaderAdyenCase(ShopinvaderAdyenCommonCase, AdyenScenario):
 
     def __init__(self, *args, **kwargs):
         super(ShopinvaderAdyenCase, self).__init__(*args, **kwargs)
-        self._decorate_test(dirname(__file__))
+        self._decorate_test(abspath(dirname(__file__)))
