@@ -94,12 +94,17 @@ class ShopinvaderAdyenCommonCase(AdyenCommonCase, CommonCase):
     def _test_3d(self, card, success=True):
         print('1')
         response, transaction, source = self._create_transaction(card)
+        print('11')
         self.assertEqual(transaction.state, 'pending')
         url, data = self._get_data_for_3d_secure(response)
+        print('111')
         pares = self._fill_3d_secure(transaction, card, success=success)
+        print('1111')
         params = self._prepare_transaction_return_params(transaction, pares)
         if success:
+            print('11111')
             response = self.service.dispatch('check_payment', params=params)
+            print('111111')
             self._check_captured(transaction, response)
             self.assertEqual(
                 response['redirect_to'],
