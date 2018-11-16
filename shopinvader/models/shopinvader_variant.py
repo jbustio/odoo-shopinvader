@@ -53,6 +53,15 @@ class ShopinvaderVariant(models.Model):
     short_name = fields.Char(compute='_compute_names')
     full_name = fields.Char(compute='_compute_names')
 
+    @api.multi
+    def _build_seo_title(self):
+        """
+        Build the SEO product name
+        :return: str
+        """
+        return u"{} | {}".format(
+            self.name or u"", self.backend_id.website_public_name or u"")
+
     def _prepare_variant_name_and_short_name(self):
         self.ensure_one()
         attributes = self.attribute_line_ids.filtered(
