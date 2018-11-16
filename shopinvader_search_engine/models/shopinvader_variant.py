@@ -25,4 +25,31 @@ class ShopinvaderVariant(models.Model):
                     ('backend_id', '=', se_backend.id),
                     ('model_id.model', '=', record._name),
                     ('lang_id', '=', record.lang_id.id)
-                    ])
+                    ], limit=1)
+
+    @api.multi
+    def _get_values_recompute_json(self, mapper, force_export=False):
+        """
+        Inherit the values dict to fill the seo_title if the backend
+        has the website_public_name filled.
+        If the seo_title is already defined, do not update it.
+        :param mapper: export mapper
+        :param force_export: bool
+        :return: dict
+        """
+        values = super(ShopinvaderVariant, self)._get_values_recompute_json(
+            mapper, force_export=force_export)
+        if not self.seo_title and self.backend_id.website_public_name:
+            name = self._build_seo_product_name()
+            values.update({
+                'seo_title': name,
+            })
+        return values
+
+    @api.mutli
+    def _build_seo_product_name(self):
+        """
+        Build the SEO product name
+        :return: str
+        """
+        return self.name + " | " + self.backend_id.website_public_name
