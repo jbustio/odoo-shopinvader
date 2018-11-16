@@ -11,6 +11,9 @@ class ShopinvaderBackend(models.Model):
 
     se_backend_id = fields.Many2one("se.backend", "Search Engine Backend")
     index_ids = fields.One2many("se.index", related="se_backend_id.index_ids")
+    website_public_name = fields.Char(
+        help="Public name of your backend/website. Used for SEO",
+    )
 
     @api.model
     def _get_default_models(self):
