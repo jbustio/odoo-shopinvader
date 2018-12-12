@@ -8,6 +8,7 @@
         <field name="arch" type="xml">
             <field name="auth_api_key_id" position="after">
                 <field name="se_backend_id"/>
+                <field name="website_public_name"/>
             </field>
             <group name="category" position="after">
                 <group name="indexes" string="Search engined indexes" col="10" colspan="4">
