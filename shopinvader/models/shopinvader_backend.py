@@ -71,6 +71,15 @@ class ShopinvaderBackend(models.Model):
         help="If checked, use the specific shopinvader display name for "
              "products instead of the original product name."
     )
+    category_binding_level = fields.Integer(
+        default=2,
+        help="Define if the product binding should also bind related "
+             "categories and how many related parents.\n"
+             "Set 0 to disable the category auto-binding.\n"
+             "Set 1 to auto-bind the direct category.\n"
+             "Set 2 to auto-bind the direct category and his parent.\n"
+             "etc.",
+    )
 
     _sql_constraints = [
         ('auth_api_key_id_uniq', 'unique(auth_api_key_id)',
@@ -126,7 +135,7 @@ class ShopinvaderBackend(models.Model):
         for backend in self:
             for lang_id in self.lang_ids:
                 for record in self.env[model].search(domain):
-                    if not self.env[bind_model].search([
+                    if not self.env[bind_model].search_count([
                             ('backend_id', '=', backend.id),
                             ('record_id', '=', record.id),
                             ('lang_id', '=', lang_id.id)]):
@@ -139,10 +148,51 @@ class ShopinvaderBackend(models.Model):
 
     @api.multi
     def bind_all_product(self):
-        return self._bind_all_content(
+        result = self._bind_all_content(
             'product.template',
             'shopinvader.product',
             [('sale_ok', '=', True)])
+        self.auto_bind_categories()
+        return result
+
+    @api.multi
+    def auto_bind_categories(self):
+        """
+        Auto bind product.category for binded shopinvader.product
+        :return: bool
+        """
+        backends = self.filtered(lambda b: b.category_binding_level > 0)
+        if not backends:
+            return True
+        all_products = self.env['shopinvader.product'].search([])
+        for backend in backends:
+            shopinv_products = all_products.filtered(
+                lambda p: p.backend_id == backend)
+            products = shopinv_products.mapped("record_id")
+            categories = self._get_related_categories(products)
+            if categories:
+                self._bind_all_content(
+                    'product.category',
+                    'shopinvader.category',
+                    [('id', 'in', categories.ids)])
+        return True
+
+    @api.multi
+    def _get_related_categories(self, products):
+        """
+        Get product.category to bind (based on current backend and
+        given products)
+        :param products: product.template recordset
+        :return: product.category recordset
+        """
+        self.ensure_one()
+        level = self.category_binding_level - 1
+        categories = products.mapped("categ_id")
+        # pull up until the correct level
+        while level > 0:
+            categories |= categories.mapped("parent_id")
+            level -= 1
+        return categories
 
     @api.multi
     def bind_all_category(self):
