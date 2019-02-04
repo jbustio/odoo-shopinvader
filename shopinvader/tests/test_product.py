@@ -433,3 +433,52 @@ class ProductCase(ProductCommonCase):
         self.assertEqual(
             product.shopinvader_display_name, product.shopinvader_name
         )
+
+    def test_product_category_auto_bind(self):
+        """
+        Test if after a product binding, the category is automatically binded
+        too (depending on the configuration).
+        :return:
+        """
+        product = self.env.ref('product.product_product_4').copy()
+        categ_obj = self.env['product.category']
+        shopinv_categ_obj = self.env['shopinvader.category']
+        categ_grand_parent = categ_obj.create({
+            'name': 'Cool grand-parent'
+        })
+        categ_parent = categ_obj.create({
+            'name': 'Strict parent',
+            'parent_id': categ_grand_parent.id,
+        })
+        categ_child = categ_obj.create({
+            'name': 'normal child',
+            'parent_id': categ_parent.id,
+        })
+        categs = categ_grand_parent | categ_parent | categ_child
+        product.write({
+            'categ_id': categ_child.id,
+        })
+        # New categories shouldn't be binded yet
+        self.assertFalse(shopinv_categ_obj.search([
+            ('record_id', 'in', categs.ids),
+        ]))
+        self.backend.write({
+            'category_binding_level': 0,
+        })
+        self.backend.bind_all_product()
+        # New categories shouldn't be binded due to binded level set to 0
+        self.assertFalse(shopinv_categ_obj.search([
+            ('record_id', 'in', categs.ids),
+        ]))
+        self.backend.write({
+            'category_binding_level': 2,
+        })
+        self.backend.bind_all_product()
+        # categ_child and categ_parent should be binded but not the categ
+        # grand_parent due to binding_level defined on 2
+        binded_categs = shopinv_categ_obj.search([
+            ('record_id', 'in', categs.ids),
+        ]).mapped("record_id")
+        self.assertIn(categ_parent, binded_categs)
+        self.assertIn(categ_child, binded_categs)
+        self.assertNotIn(categ_grand_parent, binded_categs)
