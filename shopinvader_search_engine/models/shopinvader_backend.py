@@ -12,6 +12,9 @@ class ShopinvaderBackend(models.Model):
     se_backend_id = fields.Many2one(
         'se.backend',
         'Search Engine Backend')
+    website_public_name = fields.Char(
+        help="Public name of your backend/website. Used for SEO",
+    )
 
     @api.multi
     def force_recompute_all_binding_index(self):
