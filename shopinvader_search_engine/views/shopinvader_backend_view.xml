@@ -8,6 +8,7 @@
         <field name="arch" type="xml">
             <page name="search_eng" position="inside">
                 <field name="se_backend_id"/>
+                <field name="website_public_name"/>
             </page>
             <page name="developper" position="inside">
                 <group name="indexes" string="Search engined indexes" col="10" colspan="4">
