@@ -6,6 +6,7 @@
 
 from odoo.addons.component.core import AbstractComponent
 from odoo.exceptions import UserError, MissingError
+from odoo.osv import expression
 from odoo import _
 
 
@@ -54,11 +55,25 @@ class BaseShopinvaderService(AbstractComponent):
 
     def _paginate_search(
             self,  default_page=1, default_per_page=5, **params):
+        """
+        Build a domain and search on it.
+        As we use expression (from Odoo), manuals domains built from scope or
+        domain (into params) MUST HAVE explicit operators.
+        Because in case of complex domain, it could cause unexpected domain.
+        Example:
+        domain = [('active', '=', True), ('name', 'ilike', 'test')] => NOK
+        domain = ['&', ('active', '=', True), ('name', 'ilike', 'test')] => OK
+        :param default_page: int
+        :param default_per_page: int
+        :param params: dict
+        :return: dict
+        """
         domain = self._get_base_search_domain()
         if params.get('scope'):
-            domain += self._scope_to_domain(params['scope'])
+            scope_domain = params.get('scope')
+            domain = expression.AND([domain, scope_domain])
         if params.get('domain'):
-            domain += params['domain']
+            domain = expression.AND([domain, params.get('domain')])
         model_obj = self.env[self._expose_model]
         total_count = model_obj.search_count(domain)
         page = params.get('page', default_page)
@@ -72,7 +87,7 @@ class BaseShopinvaderService(AbstractComponent):
 
     def _get(self,  _id):
         domain = self._get_base_search_domain()
-        domain.append(('id', '=', _id))
+        domain = expression.AND([domain, [('id', '=', _id)]])
         record = self.env[self._expose_model].search(domain)
         if not record:
             raise MissingError(
