@@ -5,7 +5,7 @@ from odoo import api, models
 
 
 class StockMove(models.Model):
-    _inherit = 'stock.move'
+    _inherit = "stock.move"
 
     @api.multi
     def _get_new_picking_values(self):
@@ -17,7 +17,5 @@ class StockMove(models.Model):
         values = super(StockMove, self)._get_new_picking_values()
         if self.procurement_id.sale_line_id:
             sale = self.procurement_id.sale_line_id.order_id
-            values.update({
-                'delivery_note': sale.delivery_note,
-            })
+            values.update({"delivery_note": sale.delivery_note})
         return values

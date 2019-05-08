@@ -9,7 +9,5 @@ class AbstractSaleService(AbstractComponent):
 
     def _convert_one_sale(self, sale):
         values = super(AbstractSaleService, self)._convert_one_sale(sale)
-        values.update({
-            'delivery_note': sale.delivery_note,
-        })
+        values.update({"delivery_note": sale.delivery_note})
         return values

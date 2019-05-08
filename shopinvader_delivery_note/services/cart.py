@@ -9,11 +9,7 @@ class CartService(Component):
 
     def _validator_update(self):
         validator = super(CartService, self)._validator_update()
-        validator.update({
-            'delivery_note': {
-                "type": "string",
-            },
-        })
+        validator.update({"delivery_note": {"type": "string"}})
         return validator
 
     def _prepare_delivery_note(self, delivery_note, params):
@@ -24,13 +20,12 @@ class CartService(Component):
         :param params: dict
         :return: bool
         """
-        if delivery_note:
-            params.update({
-                'delivery_note': delivery_note,
-            })
+        # If the user try to remove the value, we'll have an empty string
+        if delivery_note or isinstance(delivery_note, (str, unicode)):
+            params.update({"delivery_note": delivery_note})
         return True
 
     def _prepare_update(self, cart, params):
         params = super(CartService, self)._prepare_update(cart, params)
-        self._prepare_delivery_note(params.pop('delivery_note', False), params)
+        self._prepare_delivery_note(params.pop("delivery_note", False), params)
         return params
