@@ -4,15 +4,15 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 
+from openerp import tools
+
 from .common import ProductCommonCase
 
 
 class ProductCase(ProductCommonCase):
-    def install_lang(self, lang_xml_id):
-        lang = self.env.ref(lang_xml_id)
-        wizard = self.env["base.language.install"].create({"lang": lang.code})
-        wizard.lang_install()
-        return lang
+    def install_lang(self, lang_code):
+        tools.load_language(self.env.cr, lang_code)
+        return self.env["res.lang"].search([("code", "=", lang_code)])
 
     def test_create_shopinvader_variant(self):
         self.assertEqual(
@@ -218,7 +218,7 @@ class ProductCase(ProductCommonCase):
         self.assertEqual(len(shopinvader_categ.shopinvader_child_ids), 3)
 
     def test_category_child_with_two_lang(self):
-        lang = self.install_lang("base.lang_fr")
+        lang = self.install_lang("fr_FR")
         self.backend.lang_ids |= lang
         self.backend.bind_all_category()
         categ = self.env.ref("product.product_category_1")
@@ -243,7 +243,7 @@ class ProductCase(ProductCommonCase):
         self.assertEqual(len(shopinvader_product.shopinvader_categ_ids), 3)
 
     def test_product_category_with_two_lang(self):
-        lang = self.install_lang("base.lang_fr")
+        lang = self.install_lang("fr_FR")
         self.backend.lang_ids |= lang
         self.backend.bind_all_category()
         self.backend.bind_all_product()
@@ -253,9 +253,11 @@ class ProductCase(ProductCommonCase):
         self.assertEqual(len(shopinvader_product.shopinvader_categ_ids), 3)
         for binding in product.shopinvader_bind_ids:
             if binding.lang_id.code == "fr_FR":
-                self.assertEqual(binding.url_key, u"ipad-avec-ecran-retina")
+                self.assertEqual(
+                    binding.url_key, u"ipad-avec-ecran-retina-A2323"
+                )
             elif binding.lang_id.code == "en_US":
-                self.assertEqual(binding.url_key, u"ipad-retina-display")
+                self.assertEqual(binding.url_key, u"ipad-retina-display-A2323")
 
     def test_create_product_binding1(self):
         """
@@ -302,7 +304,7 @@ class ProductCase(ProductCommonCase):
         product_tmpl_obj = self.env["product.template"].with_context(
             active_test=False
         )
-        lang = self.env["res.lang"]._lang_get(self.env.user.lang)
+        lang_id = self.env["res.lang"]._lang_get(self.env.user.lang)
         product_values = {
             "name": "Shopinvader t-shirt",
             "shopinvader_bind_ids": [
@@ -311,7 +313,7 @@ class ProductCase(ProductCommonCase):
                     False,
                     {
                         "backend_id": backend.id,
-                        "lang_id": lang.id,
+                        "lang_id": lang_id,
                         "active": False,
                     },
                 )
@@ -344,7 +346,7 @@ class ProductCase(ProductCommonCase):
         product_tmpl_obj = self.env["product.template"].with_context(
             active_test=False
         )
-        lang = self.env["res.lang"]._lang_get(self.env.user.lang)
+        lang_id = self.env["res.lang"]._lang_get(self.env.user.lang)
         product_values = {
             "name": "Shopinvader t-shirt",
             "shopinvader_bind_ids": [
@@ -353,7 +355,7 @@ class ProductCase(ProductCommonCase):
                     False,
                     {
                         "backend_id": backend.id,
-                        "lang_id": lang.id,
+                        "lang_id": lang_id,
                         "active": True,
                     },
                 )
@@ -390,7 +392,7 @@ class ProductCase(ProductCommonCase):
         product_tmpl_obj = self.env["product.template"].with_context(
             active_test=False
         )
-        lang = self.env["res.lang"]._lang_get(self.env.user.lang)
+        lang_id = self.env["res.lang"]._lang_get(self.env.user.lang)
         product_values = {
             "name": "Shopinvader t-shirt",
             "shopinvader_bind_ids": [
@@ -399,7 +401,7 @@ class ProductCase(ProductCommonCase):
                     False,
                     {
                         "backend_id": backend.id,
-                        "lang_id": lang.id,
+                        "lang_id": lang_id,
                         "active": True,
                     },
                 )
@@ -438,11 +440,7 @@ class ProductCase(ProductCommonCase):
         self.backend.bind_all_product()
         self.user = self.env.ref("base.user_demo")
         self.user.write(
-            {
-                "groups_id": [
-                    (4, self.env.ref("sales_team.group_sale_manager").id)
-                ]
-            }
+            {"groups_id": [(4, self.env.ref("base.group_sale_manager").id)]}
         )
         self.env = self.env(user=self.user)
         product = self.env["product.template"].search(
@@ -523,7 +521,10 @@ class ProductCase(ProductCommonCase):
         too (depending on the configuration).
         :return:
         """
-        product = self.env.ref("product.product_product_4").copy()
+        original_product = self.env.ref("product.product_product_4")
+        product = original_product.copy(
+            {"name": "%s (copy)" % original_product.name}
+        )
         # To avoid others products to be binded
         self.env["product.template"].search(
             [("sale_ok", "=", True), ("id", "not in", product.ids)]
@@ -583,7 +584,10 @@ class ProductCase(ProductCommonCase):
         :return:
         """
         wizard_obj = self.env["shopinvader.variant.binding.wizard"]
-        product = self.env.ref("product.product_product_4").copy()
+        original_product = self.env.ref("product.product_product_4")
+        product = original_product.copy(
+            {"name": "%s (copy)" % original_product.name}
+        )
         wizard_values = {
             "backend_id": self.backend.id,
             "product_ids": [(6, False, product.ids)],

@@ -5,7 +5,7 @@
         <field name="model">product.category</field>
         <field name="inherit_id" ref="product.product_category_form_view"/>
         <field name="arch" type="xml">
-            <xpath expr="//sheet/group" position="after">
+            <group name="first" position="after">
                 <notebook>
                     <page name="filter" string="Filter">
                         <group colspan="4">
@@ -73,7 +73,7 @@
                         </group>
                     </page>
                 </notebook>
-            </xpath>
+            </group>
         </field>
     </record>
 

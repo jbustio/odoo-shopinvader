@@ -6,13 +6,13 @@
 
 from contextlib import contextmanager
 
-from odoo.addons.base_rest.controllers.main import _PseudoCollection
-from odoo.addons.base_rest.tests.common import BaseRestCase
-from odoo.addons.component.core import WorkContext
-from odoo.addons.component.tests.common import ComponentMixin
-from odoo.addons.queue_job.job import Job
-from odoo.addons.server_environment import serv_config
-from odoo.tests import SavepointCase
+from openerp.addons.base_rest.controllers.main import _PseudoCollection
+from openerp.addons.base_rest.tests.common import BaseRestCase
+from openerp.addons.component.core import WorkContext
+from openerp.addons.component.tests.common import ComponentMixin
+from openerp.addons.connector.queue.job import Job
+from openerp.addons.server_environment import serv_config
+from openerp.tests import SavepointCase
 
 
 class CommonMixin(ComponentMixin):

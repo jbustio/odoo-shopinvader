@@ -3,8 +3,8 @@
 # @author Sébastien BEAU <sebastien.beau@akretion.com>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import api, fields, models
-from odoo.tools import float_compare, float_round
+from openerp import api, fields, models
+from openerp.tools import float_compare, float_round
 
 from .tools import sanitize_attr_name
 
@@ -113,7 +113,7 @@ class ShopinvaderVariant(models.Model):
             lambda r: not company or r.company_id == company
         )
         # get the expeced tax to apply from the fiscal position
-        tax_id = fposition.map_tax(taxes, product_id) if fposition else taxes
+        tax_id = fposition.map_tax(taxes) if fposition else taxes
         tax_id = tax_id and tax_id[0]
         product = product_id.with_context(
             quantity=qty, pricelist=pricelist.id, fiscal_position=fposition

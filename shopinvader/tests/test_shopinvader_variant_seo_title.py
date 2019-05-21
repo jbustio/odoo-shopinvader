@@ -3,7 +3,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 from uuid import uuid4
 
-from odoo.addons.shopinvader.tests.common import ProductCommonCase
+from openerp.addons.shopinvader.tests.common import ProductCommonCase
 
 
 class TestShopinvaderVariantTest(ProductCommonCase):

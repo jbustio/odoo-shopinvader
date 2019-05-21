@@ -3,9 +3,9 @@
 # @author Sébastien BEAU <sebastien.beau@akretion.com>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import _, api, fields, models, tools
-from odoo.addons.server_environment import serv_config
-from odoo.http import request
+from openerp import _, api, fields, models, tools
+from openerp.addons.server_environment import serv_config
+from openerp.http import request
 
 
 class ShopinvaderBackend(models.Model):
@@ -278,7 +278,7 @@ class ShopinvaderBackend(models.Model):
             record.id,
         )
         for notif in notifs:
-            notif.with_delay(description=description).send(record.id)
+            notif._jobify_send(record_id=record.id, description=description)
         return True
 
     def _extract_configuration(self):

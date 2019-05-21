@@ -3,8 +3,8 @@
 # @author Sébastien BEAU <sebastien.beau@akretion.com>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import fields
-from odoo.exceptions import MissingError
+from openerp import fields
+from openerp.exceptions import MissingError
 
 from .common import CommonCase
 

@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 # Copyright 2016 Cédric Pigeon
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
-from odoo.addons.component.tests.common import SavepointComponentCase
+from openerp import tools
+from openerp.addons.component.tests.common import SavepointComponentCase
 
 
 class TestShopinvaderCategoryBindingWizard(SavepointComponentCase):
@@ -118,11 +119,9 @@ class TestShopinvaderCategoryBindingWizard(SavepointComponentCase):
         bind_record = self.category_bind_model.search(domain)
         self.assertEqual(len(bind_record), 1)
 
-    def install_lang(self, lang_xml_id):
-        lang = self.env.ref(lang_xml_id)
-        wizard = self.env["base.language.install"].create({"lang": lang.code})
-        wizard.lang_install()
-        return lang
+    def install_lang(self, lang_code):
+        tools.load_language(self.env.cr, lang_code)
+        return self.env["res.lang"].search([("code", "=", lang_code)])
 
     def test_category_binding_multi_lang(self):
         """
@@ -131,7 +130,7 @@ class TestShopinvaderCategoryBindingWizard(SavepointComponentCase):
         - unbind it
         - bind it again
         """
-        lang = self.install_lang("base.lang_fr")
+        lang = self.install_lang("fr_FR")
         self.backend.lang_ids |= lang
         self.backend2.lang_ids |= lang
         category_bind_model = self.category_bind_model

@@ -4,10 +4,10 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 
-from odoo import _
-from odoo.addons.component.core import AbstractComponent
-from odoo.exceptions import MissingError, UserError
-from odoo.osv import expression
+from openerp import _
+from openerp.addons.component.core import AbstractComponent
+from openerp.exceptions import MissingError, UserError
+from openerp.osv import expression
 
 
 class BaseShopinvaderService(AbstractComponent):
@@ -57,7 +57,7 @@ class BaseShopinvaderService(AbstractComponent):
     def _paginate_search(self, default_page=1, default_per_page=5, **params):
         """
         Build a domain and search on it.
-        As we use expression (from Odoo), manuals domains get from "scope" and
+        As we use expression (from openerp), manuals domains get from "scope" and
         "domain" keys are normalized to avoid issues.
         :param default_page: int
         :param default_per_page: int

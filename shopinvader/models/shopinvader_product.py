@@ -5,7 +5,7 @@
 
 from collections import defaultdict
 
-from odoo import api, fields, models
+from openerp import api, fields, models
 
 from .tools import _build_slugified_field_by_id
 
@@ -169,11 +169,8 @@ class ShopinvaderProduct(models.Model):
         Toggle the active field
         :return: dict
         """
-        actual_active = self.filtered(lambda s: s.active).with_prefetch(
-            self._prefetch
-        )
+        actual_active = self.filtered(lambda s: s.active)
         actual_inactive = self - actual_active
-        actual_inactive = actual_inactive.with_prefetch(self._prefetch)
         if actual_inactive:
             actual_inactive.write({"active": True})
         if actual_active:

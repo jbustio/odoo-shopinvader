@@ -3,9 +3,10 @@
 # @author Sébastien BEAU <sebastien.beau@akretion.com>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import api, fields, models
-from odoo.addons.queue_job.job import job
-from odoo.tools.translate import _
+from openerp import api, fields, models
+from openerp.addons.connector.queue.job import job
+from openerp.addons.connector.session import ConnectorSession
+from openerp.tools.translate import _
 
 
 class ShopinvaderNotification(models.Model):
@@ -81,3 +82,16 @@ class ShopinvaderNotification(models.Model):
     def send(self, record_id):
         self.ensure_one()
         return self.template_id.send_mail(record_id)
+
+    @api.multi
+    def _jobify_send(self, record_id, description=None):
+        self.ensure_one()
+        session = ConnectorSession.from_env(self.env)
+        shopinvader_notification_do_send.delay(
+            session, self._name, self.ids, record_id, description=description
+        )
+
+
+@job(default_channel="root.shopinvader.notification")
+def shopinvader_notification_do_send(session, model_name, _id, record_id):
+    session.env[model_name].browse(_id).send(record_id)

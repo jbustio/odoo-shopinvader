@@ -36,5 +36,8 @@ class BackendCase(CommonCase):
 
     def test_rebind_all_category(self):
         self._bind_all_category()
-        self.env["shopinvader.category"].search([], limit=1).unlink()
+        category = self.env["shopinvader.category"].search(
+            [("shopinvader_child_ids", "=", False)], limit=1
+        )
+        category.unlink()
         self.assertEqual(*self._bind_all_category())

@@ -6,13 +6,13 @@
 {
     "name": "Shopinvader",
     "summary": "Shopinvader",
-    "version": "10.0.2.0.4",
+    "version": "9.0.2.0.4",
     "category": "e-commerce",
     "website": "https://akretion.com",
     "author": "Akretion",
     "license": "AGPL-3",
     "application": True,
-    "installable": False,
+    "installable": True,
     "external_dependencies": {
         "python": ["cerberus", "unidecode", "openupgradelib"],
         "bin": [],
@@ -28,8 +28,9 @@
         "component_event",
         "sale",
         "sale_discount_display_amount",
+        "sale_pricelist_discount",
         "onchange_helper",
-        "queue_job",
+        "connector",
     ],
     "data": [
         "security/shopinvader_security.xml",
