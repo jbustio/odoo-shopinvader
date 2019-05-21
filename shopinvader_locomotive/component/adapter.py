@@ -6,9 +6,9 @@
 import json
 import logging
 
-from odoo import _
-from odoo.addons.component.core import AbstractComponent, Component
-from odoo.exceptions import UserError
+from openerp import _
+from openerp.addons.component.core import AbstractComponent, Component
+from openerp.exceptions import UserError
 
 _logger = logging.getLogger(__name__)
 
@@ -30,7 +30,7 @@ class LocomotiveAdapter(AbstractComponent):
         backend = self.collection
         self.client = locomotivecms.LocomotiveClient(
             backend.username,
-            backend._get_keychain_account()._get_password(),
+            backend.password,
             backend.handle,
             backend.location,
         )

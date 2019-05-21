@@ -3,16 +3,15 @@
 # @author Sébastien BEAU <sebastien.beau@akretion.com>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import api, models
-from odoo.addons.queue_job.job import job, related_action
+from openerp import api, models
+from openerp.addons.connector.queue.job import job
+from openerp.addons.connector.session import ConnectorSession
 
 
 class LocomotiveBinding(models.AbstractModel):
     _name = "locomotive.binding"
     # Your model must also have _inherit = 'shopinvader.binding'
 
-    @job(default_channel="root.shopinvader")
-    @related_action(action="related_action_unwrap_binding")
     @api.multi
     def export_record(self, _fields=None):
         self.ensure_one()
@@ -20,13 +19,25 @@ class LocomotiveBinding(models.AbstractModel):
             exporter = work.component(usage="record.exporter")
             return exporter.run(self)
 
-    @job(default_channel="root.shopinvader")
-    @related_action(action="related_action_unwrap_binding")
     @api.model
     def export_delete_record(self, backend, external_id):
         with backend.work_on(self._name) as work:
             deleter = work.component(usage="record.exporter.deleter")
             return deleter.run(external_id)
+
+    @api.multi
+    def _jobify_export_record(self, _fields):
+        session = ConnectorSession.from_env(self.env)
+        return shopinvader_do_export_record.delay(
+            session, self._name, self.ids, _fields
+        )
+
+    @api.multi
+    def _jobify_export_delete_record(self, external_id):
+        session = ConnectorSession.from_env(self.env)
+        return shopinvader_do_export_delete_record.delay(
+            session, self._name, self.id, external_id
+        )
 
     _sql_constraints = [
         (
@@ -35,3 +46,14 @@ class LocomotiveBinding(models.AbstractModel):
             "A binding already exists with the same Locomotive ID.",
         )
     ]
+
+
+@job(default_channel="root.shopinvader")
+def shopinvader_do_export_record(session, model_name, _ids, _fields):
+    return session.env[model_name].browse(_ids).export_record(_fields)
+
+
+@job(default_channel="root.shopinvader")
+def shopinvader_do_export_delete_record(session, model_name, _id, external_id):
+    record = session.env[model_name].browse(_id)
+    return record.export_delete_record(record.backend_id, external_id)

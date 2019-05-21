@@ -3,8 +3,8 @@
 # @author Sébastien BEAU <sebastien.beau@akretion.com>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo.addons.component.core import Component
-from odoo.addons.component_event import skip_if
+from openerp.addons.component.core import Component
+from openerp.addons.component_event import skip_if
 
 
 class ShopinvaderBindingListener(Component):
@@ -15,19 +15,17 @@ class ShopinvaderBindingListener(Component):
 
     @skip_if(lambda self, record, **kwargs: self.no_connector_export(record))
     def on_record_create(self, record, fields=None):
-        record.with_delay().export_record(_fields=fields)
+        record._jobify_export_record(_fields=fields)
 
     @skip_if(lambda self, record, **kwargs: self.no_connector_export(record))
     def on_record_write(self, record, fields=None):
-        record.with_delay().export_record(_fields=fields)
+        record._jobify_export_record(_fields=fields)
 
     def on_record_unlink(self, record):
         with record.backend_id.work_on(record._name) as work:
             external_id = work.component(usage="binder").to_external(record)
             if external_id:
-                record.with_delay().export_delete_record(
-                    record.backend_id, external_id
-                )
+                record._jobify_export_delete_record(external_id)
 
 
 class ShopinvaderRecordListener(Component):
@@ -43,7 +41,7 @@ class ShopinvaderRecordListener(Component):
         if "shopinvader_bind_ids" not in record._fields:
             return
         for binding in record.shopinvader_bind_ids:
-            binding.with_delay().export_record(_fields=fields)
+            binding._jobify_export_record(_fields=fields)
 
     def on_record_unlink(self, record, fields=None):
         """ Unlink all binding before removing the record in order to

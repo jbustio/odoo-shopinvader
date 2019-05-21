@@ -3,18 +3,20 @@
 # @author Sébastien BEAU <sebastien.beau@akretion.com>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import api, fields, models
+from openerp import api, fields, models
 
 
 class ShopinvaderBackend(models.Model):
     _description = "Locomotive CMS Backend"
     _name = "shopinvader.backend"
-    _inherit = ["shopinvader.backend", "connector.backend", "keychain.backend"]
+    _inherit = ["shopinvader.backend", "connector.backend"]
     _backend_name = "locomotivecms"
 
-    location = fields.Char(required=True, sparse="data")
-    username = fields.Char(required=True, sparse="data")
-    handle = fields.Char(required=True, sparse="data")
+    version = fields.Selection(required=False)  # inherited  but no more used
+    location = fields.Char()  # required in UI
+    username = fields.Char()  # required in UI
+    password = fields.Char()  # required in UI
+    handle = fields.Char()  # required in UI
     currency_ids = fields.Many2many(
         comodel_name="res.currency", string="Currency"
     )

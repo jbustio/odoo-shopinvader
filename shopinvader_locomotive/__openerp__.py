@@ -5,20 +5,20 @@
 
 {
     "name": "Shopinvader Locomotive CMS Connector",
-    "version": "10.0.1.0.1",
+    "version": "9.0.1.0.1",
     "category": "Connector",
     "summary": "Manage communications between Shopinvader and Locomotive CMS",
     "author": "Akretion",
     "website": "http://www.akretion.com",
     "license": "AGPL-3",
     "images": [],
-    "depends": ["connector", "queue_job", "keychain", "shopinvader"],
+    "depends": ["connector", "shopinvader"],
     "data": ["views/shopinvader_backend_view.xml", "data/ir_cron.xml"],
     "demo": ["demo/backend_demo.xml"],
     "test": [],
     "external_dependencies": {"python": ["locomotivecms", "openupgradelib"]},
     "pre_init_hook": "rename_module",
-    "installable": False,
+    "installable": True,
     "auto_install": False,
     "application": False,
 }

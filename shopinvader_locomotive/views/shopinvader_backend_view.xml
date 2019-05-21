@@ -21,9 +21,9 @@
                 </group>
             </page>
             <field name="location" position="after">
-                <field name="username" string="Email" colspan="2"/>
-                <field name="password" colspan="2"/>
-                <field name="handle" colspan="2"/>
+                <field name="username" string="Email" colspan="2" requried="1"/>
+                <field name="password" colspan="2" password="True" required="1"/>
+                <field name="handle" colspan="2" required="1"/>
             </field>
             <field name="pricelist_id" position="after">
                 <field

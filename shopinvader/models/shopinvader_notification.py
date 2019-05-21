@@ -78,7 +78,6 @@ class ShopinvaderNotification(models.Model):
             else:
                 return {"domain": {"model_id": []}}
 
-    @job(default_channel="root.shopinvader.notification")
     def send(self, record_id):
         self.ensure_one()
         return self.template_id.send_mail(record_id)
@@ -94,4 +93,4 @@ class ShopinvaderNotification(models.Model):
 
 @job(default_channel="root.shopinvader.notification")
 def shopinvader_notification_do_send(session, model_name, _id, record_id):
-    session.env[model_name].browse(_id).send(record_id)
+    return session.env[model_name].browse(_id).send(record_id)
