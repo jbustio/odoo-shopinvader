@@ -4,7 +4,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 
-from odoo.tests.common import TransactionCase
+from openerp.tests.common import TransactionCase
 
 
 class TestProductStockState(TransactionCase):
@@ -17,7 +17,7 @@ class TestProductStockState(TransactionCase):
         )
         self.product_by_categ_direct = self.env.ref("stock.product_icecream")
         self.product_by_categ_inherit = self.env.ref(
-            "product.product_order_01"
+            "product.product_product_40"
         )
         self.product_by_product = self.env.ref(
             "product_stock_state.product_setting_by_product"

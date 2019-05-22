@@ -3,12 +3,17 @@
 # @author Sylvain LE GAL <https://twitter.com/legalsylvain>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import fields, models
+from openerp import fields, models
 
 
 class SaleConfigSettings(models.TransientModel):
     _inherit = "sale.config.settings"
-
+    company_id = fields.Many2one(
+        "res.company",
+        string="Company",
+        required=True,
+        default=lambda self: self.env.user.company_id,
+    )
     stock_state_threshold = fields.Float(
         related="company_id.stock_state_threshold",
         string="Stock State Threshold *",

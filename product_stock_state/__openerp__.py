@@ -10,13 +10,13 @@
     "name": "Product Stock State",
     "summary": "Compute the state stock based on"
     "the stock level and sale_ok field",
-    "version": "10.0.1.0.0",
+    "version": "9.0.1.0.0",
     "category": "Uncategorized",
     "website": "www.akretion.com",
     "author": " Akretion,GRAP",
     "license": "AGPL-3",
     "application": False,
-    "installable": False,
+    "installable": True,
     "external_dependencies": {"python": [], "bin": []},
     "depends": ["sale_stock"],
     "data": [
