@@ -3,15 +3,15 @@
 # Copyright 2018 ACSONE SA/NV
 # Sébastien BEAU <sebastien.beau@akretion.com>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
-from odoo import api, models
-from odoo.addons.queue_job.job import job
+from openerp import _, api, models
+from openerp.addons.connector.queue.job import identity_exact, job
+from openerp.addons.connector.session import ConnectorSession
 
 
 class ProductProduct(models.Model):
     _inherit = "product.product"
 
     @api.multi
-    @job(default_channel="root.search_engine.synchronize_stock")
     def _synchronize_all_binding_stock_level(self):
         """
         The goal of this function is to compute the new stock information
@@ -52,3 +52,20 @@ class ProductProduct(models.Model):
                         if binding.sync_state == "done":
                             vals["sync_state"] = "to_update"
                         binding.write(vals)
+
+    def _jobify_synchronize_all_binding_stock_level(self):
+        description = _("Update shopinvader variants (stock update trigger)")
+        session = ConnectorSession.from_env(self.env)
+        shopinvader_synchronize_all_binding_stock_level.delay(
+            session,
+            self._name,
+            self.ids,
+            description=description,
+            identity_key=identity_exact,
+        )
+
+
+@job(default_channel="root.search_engine.synchronize_stock")
+def shopinvader_synchronize_all_binding_stock_level(session, model_name, ids):
+    products = session.env[model_name].browse(ids)
+    return products._synchronize_all_binding_stock_level()

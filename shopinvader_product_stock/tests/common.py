@@ -3,11 +3,47 @@
 # @author Sébastien BEAU <sebastien.beau@akretion.com>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo.addons.connector_search_engine.tests.test_all import (
+import unittest
+
+from openerp.addons.connector.queue.job import OpenERPJobStorage
+from openerp.addons.connector.session import ConnectorSession
+from openerp.addons.connector_search_engine.tests.test_all import (
     TestBindingIndexBaseFake,
 )
-from odoo.addons.queue_job.tests.common import JobMixin
-from odoo.addons.server_environment import serv_config
+from openerp.addons.server_environment import serv_config
+
+
+class JobCounter(object):
+    def __init__(self, env):
+        super(JobCounter, self).__init__()
+        self.env = env
+        self.existing = self.search_all()
+
+    def count_all(self):
+        return len(self.search_all())
+
+    def count_created(self):
+        return len(self.search_created())
+
+    def count_existing(self):
+        return len(self.existing)
+
+    def search_created(self):
+        return self.search_all() - self.existing
+
+    def search_all(self):
+        return self.env["queue.job"].search([])
+
+
+class JobMixin(unittest.TestCase):
+    def job_counter(self):
+        return JobCounter(self.env)
+
+    def perform_jobs(self, jobs):
+        session = ConnectorSession.from_env(self.env)
+        storage = OpenERPJobStorage(session)
+        for job in jobs.search_created():
+            storage.load(job.uuid).perform(session)
 
 
 class StockCommonCase(TestBindingIndexBaseFake, JobMixin):
@@ -59,10 +95,7 @@ class StockCommonCase(TestBindingIndexBaseFake, JobMixin):
         super(StockCommonCase, cls).setUpClass()
         cls.env = cls.env(
             context=dict(
-                cls.env.context,
-                tracking_disable=True,  # speed up tests
-                # TODO: requires https://github.com/OCA/queue/pull/114
-                test_queue_job_no_delay=False,  # we want the jobs
+                cls.env.context, tracking_disable=True  # speed up tests
             )
         )
 

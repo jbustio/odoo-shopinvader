@@ -4,8 +4,7 @@
 # Sébastien BEAU <sebastien.beau@akretion.com>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
-from odoo import _, api, models
-from odoo.addons.queue_job.job import identity_exact
+from openerp import api, models
 
 
 class StockMove(models.Model):
@@ -28,12 +27,7 @@ class StockMove(models.Model):
         """
         products = self._get_product_to_update()
         if products:
-            description = _(
-                "Update shopinvader variants (stock update trigger)"
-            )
-            products.with_delay(
-                description=description, identity_key=identity_exact
-            )._synchronize_all_binding_stock_level()
+            products._jobify_synchronize_all_binding_stock_level()
         return True
 
     @api.multi
