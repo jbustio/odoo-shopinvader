@@ -11,7 +11,7 @@
     "website": "https://akretion.com",
     "author": "Akretion",
     "license": "AGPL-3",
-    "application": True,
+    "application": False,
     "installable": False,
     "external_dependencies": {"python": [], "bin": []},
     "depends": ["shopinvader", "sale_shipping_info_helper"],
