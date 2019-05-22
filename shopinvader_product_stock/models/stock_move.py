@@ -44,12 +44,12 @@ class StockMove(models.Model):
     def action_confirm(self):
         """
 
-        :return: stock.move recordset
+        :return:bool
         """
-        # action_confirm on stock_move method can return a new recorset in
-        # case of BOM
+        # TODO action_confirm on stock_move method can confirm more move than
+        # the current recordset in case of BOM
         result = super(StockMove, self).action_confirm()
-        result._jobify_product_stock_update()
+        self._jobify_product_stock_update()
         return result
 
     @api.multi
