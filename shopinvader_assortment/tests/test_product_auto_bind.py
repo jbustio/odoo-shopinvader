@@ -2,7 +2,7 @@
 # Copyright 2018 ACSONE SA/NV
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo.tests.common import TransactionCase
+from openerp.tests.common import TransactionCase
 
 
 class TestProductAutoBind(TransactionCase):
@@ -27,8 +27,8 @@ class TestProductAutoBind(TransactionCase):
             [("backend_id", "=", self.backend.id)]
         )
 
-        self.assertEqual(
-            products_to_bind.ids, variants.mapped("record_id").ids
+        self.assertSetEqual(
+            set(products_to_bind.ids), set(variants.mapped("record_id").ids)
         )
 
         # Exclude one product, related binding should be inactivated
@@ -84,8 +84,8 @@ class TestProductAutoBind(TransactionCase):
             [("backend_id", "=", self.backend.id)]
         )
 
-        self.assertEqual(
-            products_to_bind.ids, variants.mapped("record_id").ids
+        self.assertSetEqual(
+            set(products_to_bind.ids), set(variants.mapped("record_id").ids)
         )
 
         # Exclude one product, related binding should be inactivated
