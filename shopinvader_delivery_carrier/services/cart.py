@@ -6,10 +6,10 @@
 
 import logging
 
-from odoo.addons.component.core import AbstractComponent, Component
-from odoo.exceptions import UserError
-from odoo.tools import float_round
-from odoo.tools.translate import _
+from openerp.addons.component.core import AbstractComponent, Component
+from openerp.exceptions import UserError
+from openerp.tools import float_round
+from openerp.tools.translate import _
 
 _logger = logging.getLogger(__name__)
 

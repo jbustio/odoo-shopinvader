@@ -5,8 +5,8 @@
 
 import logging
 
-from odoo.addons.shopinvader.controllers import main
-from odoo.http import route
+from openerp.addons.shopinvader.controllers import main
+from openerp.http import route
 
 _logger = logging.getLogger(__name__)
 

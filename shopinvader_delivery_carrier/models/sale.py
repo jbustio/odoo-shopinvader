@@ -3,7 +3,7 @@
 # @author Sébastien BEAU <sebastien.beau@akretion.com>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import models
+from openerp import models
 
 
 class SaleOrder(models.Model):
@@ -14,5 +14,5 @@ class SaleOrder(models.Model):
         return (
             self.shopinvader_backend_id.with_context(order_id=self.id)
             .carrier_ids.filtered("available")
-            .sorted("price")
+            .sorted(lambda a: a.price)
         )

@@ -10,7 +10,8 @@ from openerp.addons.base_rest.controllers.main import _PseudoCollection
 from openerp.addons.base_rest.tests.common import BaseRestCase
 from openerp.addons.component.core import WorkContext
 from openerp.addons.component.tests.common import ComponentMixin
-from openerp.addons.connector.queue.job import Job
+from openerp.addons.connector.queue.job import OpenERPJobStorage
+from openerp.addons.connector.session import ConnectorSession
 from openerp.addons.server_environment import serv_config
 from openerp.tests import SavepointCase
 
@@ -57,8 +58,10 @@ class CommonMixin(ComponentMixin):
         self.assertEqual(len(self.created_jobs), nbr)
 
     def _perform_created_job(self):
+        session = ConnectorSession.from_env(self.env)
+        storage = OpenERPJobStorage(session)
         for job in self.created_jobs:
-            Job.load(self.env, job.uuid).perform()
+            storage.load(job.uuid).perform(session)
 
 
 class CommonCase(SavepointCase, CommonMixin):

@@ -2,7 +2,7 @@
 # Copyright 2019 Akretion (http://www.akretion.com).
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo.addons.shopinvader.tests.test_notification import (
+from openerp.addons.shopinvader.tests.test_notification import (
     CommonNotificationCase,
 )
 
