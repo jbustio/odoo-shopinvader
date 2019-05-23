@@ -6,7 +6,7 @@
 {
     "name": "Shopinvader image",
     "summary": "Add the export of Image for Shopinvader",
-    "version": "10.0.1.0.1",
+    "version": "9.0.1.0.1",
     "category": "e-commerce",
     "website": "https://akretion.com",
     "author": "Akretion",
@@ -24,5 +24,5 @@
         "demo/backend_demo.xml",
     ],
     "post_init_hook": "post_init_hook",
-    "installable": False,
+    "installable": True,
 }
