@@ -6,9 +6,9 @@
         <field name="inherit_id"
                ref="shopinvader.shopinvader_backend_view_form"/>
         <field name="arch" type="xml">
-             <page name="search_eng" position="inside">
+             <field name="website_public_name" position="after">
                 <field name="se_backend_id"/>
-            </page>
+            </field>
             <page name="developper" position="inside">
                 <group name="indexes" string="Search engine indexes" col="10" colspan="4">
                     <button
