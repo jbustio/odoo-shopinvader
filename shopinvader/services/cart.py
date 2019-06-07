@@ -5,6 +5,7 @@
 # pylint: disable=consider-merging-classes-inherited
 
 import logging
+from contextlib import contextmanager
 
 from odoo.addons.base_rest.components.service import to_int
 from odoo.addons.component.core import Component
@@ -149,20 +150,63 @@ class CartService(Component):
         else:
             with self.env.norecompute():
                 vals = self._prepare_cart_item(params, cart)
-                # the next statement is done with suspending the security for
-                #  performance reasons. It is safe only if both 3 following
-                # fields are filled on the sale order:
-                # - company_id
-                # - fiscal_position_id
-                # - pricelist_id
-                new_values = (
-                    self.env["sale.order.line"]
-                    .suspend_security()
-                    .play_onchanges(vals, vals.keys())
-                )
+                new_values = self._sale_order_line_onchange(vals)
                 vals.update(new_values)
-                self.env["sale.order.line"].create(vals)
+                self._create_sale_order_line(vals)
             cart.recompute()
+
+    @contextmanager
+    def _simulate_anonymous_lang(self, values):
+        """
+        Simulate the anonymous partner lang using the lang from the context.
+        To avoid to fill sale.order.line name/description with the anonymous
+        lang if the lang of the context is different.
+        This function update (in cache only) the anonymous partner's lang,
+        then you do your job (create etc) and the previous lang is
+        automatically reset with the original one.
+        Usage:
+        with self._simulate_anonymous_lang(vals):
+            # Do your job here
+        :param values: dict
+        :return:
+        """
+        order_id = values.get("order_id")
+        partner = self.env["sale.order"].browse(order_id).partner_id
+        if partner:
+            original_lang = partner.lang
+            ctx_lang = self.env.context.get("lang", partner.lang)
+            anonymous_partner = self.shopinvader_backend.anonymous_partner_id
+            if partner == anonymous_partner and partner.lang != ctx_lang:
+                # We can update (in cache only) the partner's lang without
+                # doing a real write (sql; to avoid concurrent update).
+                with self.env.do_in_draft():
+                    partner.lang = ctx_lang
+                    yield
+                    partner.lang = original_lang
+                return
+        yield
+
+    def _create_sale_order_line(self, vals):
+        with self._simulate_anonymous_lang(vals):
+            line = self.env["sale.order.line"].create(vals)
+        return line
+
+    def _sale_order_line_onchange(self, vals):
+        """
+        Simulate the onchange on sale.order.line with given vals.
+        :param vals: dict
+        :return: dict
+        """
+        # the next statement is done with suspending the security for
+        #  performance reasons. It is safe only if both 3 following
+        # fields are filled on the sale order:
+        # - company_id
+        # - fiscal_position_id
+        # - pricelist_id
+        so_line_obj = self.env["sale.order.line"].suspend_security()
+        with self._simulate_anonymous_lang(vals):
+            new_values = so_line_obj.play_onchanges(vals, vals.keys())
+        return new_values
 
     def _update_item(self, cart, params, item=False):
         if not item:
