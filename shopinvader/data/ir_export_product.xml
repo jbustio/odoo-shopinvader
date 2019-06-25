@@ -35,11 +35,13 @@
 
     <record id="ir_exp_shopinvader_short_description" model="ir.exports.line">
         <field name="name">short_description</field>
+        <field name="alias">short_description</field>
         <field name="export_id" ref="ir_exp_shopinvader_variant"/>
     </record>
 
     <record id="ir_exp_shopinvader_description" model="ir.exports.line">
         <field name="name">description</field>
+        <field name="alias">description</field>
         <field name="export_id" ref="ir_exp_shopinvader_variant"/>
     </record>
 
