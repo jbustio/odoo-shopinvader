@@ -3,11 +3,7 @@
 # @author Sébastien BEAU <sebastien.beau@akretion.com>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from collections import defaultdict
-
 from odoo import api, fields, models
-
-from .tools import _build_slugified_field_by_id
 
 
 class ShopinvaderProduct(models.Model):
@@ -93,8 +89,7 @@ class ShopinvaderProduct(models.Model):
             for categ in categs:
                 parents = self.env["shopinvader.category"].search(
                     [
-                        ("parent_left", "<=", categ.parent_left),
-                        ("parent_right", ">=", categ.parent_right),
+                        ("record_id", "parent_of", categ.id),
                         ("backend_id", "=", record.backend_id.id),
                         ("lang_id", "=", record.lang_id.id),
                     ]
@@ -109,6 +104,9 @@ class ShopinvaderProduct(models.Model):
             values.update({"active": variant.active})
         return values
 
+    def _get_variants(self):
+        return self.product_variant_ids
+
     def _create_shopinvader_variant(self):
         """
         Create missing shopinvader.variant and return new just created
@@ -118,7 +116,7 @@ class ShopinvaderProduct(models.Model):
         self_ctx = self.with_context(active_test=False)
         shopinv_variant_obj = self_ctx.env["shopinvader.variant"]
         shopinv_variants = shopinv_variant_obj.browse()
-        for variant in self_ctx.product_variant_ids:
+        for variant in self_ctx._get_variants():
             if not shopinv_variant_obj.search_count(
                 [
                     ("record_id", "=", variant.id),
@@ -136,24 +134,17 @@ class ShopinvaderProduct(models.Model):
             binding._create_shopinvader_variant()
         return binding
 
+    def _get_url_keywords(self):
+        self.ensure_one()
+        keywords = super(ShopinvaderProduct, self)._get_url_keywords()
+        if self.default_code:
+            keywords.append(self.default_code)
+        return keywords
+
     @api.multi
     @api.depends("lang_id", "record_id.name")
     def _compute_automatic_url_key(self):
-        records_by_lang = defaultdict(self.browse)
-        for record in self:
-            records_by_lang[record.lang_id] |= record
-        key_by_id = {}
-        for lang_id, records in records_by_lang.items():
-            key_by_id.update(
-                _build_slugified_field_by_id(
-                    records.with_context(lang=lang_id.code), "name"
-                )
-            )
-        for record in self:
-            key = key_by_id[record.id]
-            if record.default_code:
-                key = "-".join([key, record.default_code])
-            record.automatic_url_key = key
+        self._generic_compute_automatic_url_key()
 
     @api.model
     def default_get(self, fields_list):

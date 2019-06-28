@@ -2,12 +2,9 @@
 # Copyright 2017 Akretion (http://www.akretion.com).
 # @author Sébastien BEAU <sebastien.beau@akretion.com>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
-from collections import defaultdict
 
 from odoo import api, fields, models
 from odoo.addons.base_url.models.abstract_url import get_model_ref
-
-from .tools import _build_slugified_field_by_id
 
 
 class ShopinvaderCategory(models.Model):
@@ -37,10 +34,8 @@ class ShopinvaderCategory(models.Model):
         index=True,
         compute_sudo=True,
     )
-    shopinvader_child_ids = fields.Many2many(
-        "shopinvader.category",
-        "Shopinvader Childs",
-        compute="_compute_child_category",
+    shopinvader_child_ids = fields.One2many(
+        "shopinvader.category", inverse_name="shopinvader_parent_id"
     )
     level = fields.Integer(compute="_compute_level")
     redirect_url_key = fields.Serialized(
@@ -72,48 +67,36 @@ class ShopinvaderCategory(models.Model):
         for record in self:
             record.object_id = record.record_id.id
 
-    @api.depends("parent_id.shopinvader_bind_ids")
+    @api.depends(
+        "parent_id.shopinvader_bind_ids.shopinvader_parent_id",
+        "shopinvader_parent_id.active",
+    )
     def _compute_parent_category(self):
         for record in self:
             for binding in record.parent_id.shopinvader_bind_ids:
                 if (
                     binding.backend_id == record.backend_id
                     and binding.lang_id == record.lang_id
+                    and binding.active
                 ):
                     record.shopinvader_parent_id = binding
                     break
 
-    def _compute_child_category(self):
-        for record in self:
-            record.shopinvader_child_ids = self.search(
-                [
-                    ("lang_id", "=", record.lang_id.id),
-                    ("record_id.parent_id", "=", record.record_id.id),
-                    ("backend_id", "=", record.backend_id.id),
-                ]
-            )
+    def _post_process_url_key(self, key):
+        key = super(ShopinvaderCategory, self)._post_process_url_key(key)
+        if self.parent_id and self.shopinvader_parent_id.active:
+            if not self.shopinvader_parent_id.automatic_url_key:
+                self.shopinvader_parent_id._compute_automatic_url_key()
+            parent_url = self.shopinvader_parent_id.automatic_url_key
+            key = "/".join([parent_url, key])
+        return key
 
     @api.multi
     @api.depends(
         "lang_id", "record_id.name", "shopinvader_parent_id.automatic_url_key"
     )
     def _compute_automatic_url_key(self):
-        records_by_lang = defaultdict(self.browse)
-        for record in self:
-            records_by_lang[record.lang_id] |= record
-        key_by_id = {}
-        for lang_id, records in records_by_lang.items():
-            key_by_id.update(
-                _build_slugified_field_by_id(
-                    records.with_context(lang=lang_id.code), "name"
-                )
-            )
-        for record in self:
-            key = key_by_id[record.id]
-            if record.parent_id and record.shopinvader_parent_id:
-                parent_url = record.shopinvader_parent_id.automatic_url_key
-                key = "/".join([parent_url, key])
-            record.automatic_url_key = key
+        self._generic_compute_automatic_url_key()
 
     @api.depends(
         "shopinvader_parent_id",
