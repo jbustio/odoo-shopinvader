@@ -14,14 +14,33 @@ from odoo.tools.translate import _
 class CartService(Component):
     _inherit = "shopinvader.cart.service"
 
-    def get_delivery_methods(self):
+    def get_delivery_methods(self, **params):
         """
-            This service will return all possible delivery methods for the
-            current cart
-        :return:
+        This service will return all possible delivery methods for the
+        current cart (depending on country/zip)
+        The cart is not updated with the given country/zip. The change is done
+        only in memory.
+        :param params: dict
+        :return: dict
         """
         cart = self._get()
-        return self._get_available_carrier(cart)
+        country = self._load_country(params)
+        zip_code = self._load_zip_code(params)
+        if country or zip_code:
+            with self._simulate_delivery_cost(cart):
+                # Edit country and zip
+                # Even if some info are not provided, we have to fill them
+                # Ex: if the zip code is not provided, we have to do the
+                # simulation with an empty zip code on the partner. Because his
+                # current zip could be related to another country and simulate
+                # a wrong price.
+                cart.partner_id.update(
+                    {"country_id": country.id, "zip": zip_code}
+                )
+                result = self._get_available_carrier(cart)
+        else:
+            result = self._get_available_carrier(cart)
+        return result
 
     def apply_delivery_method(self, **params):
         """
@@ -48,44 +67,11 @@ class CartService(Component):
         :param cart: sale.order recordset
         :return:
         """
-        cart_values = cart._convert_to_write(cart._cache)
-        cart_values.pop("order_line", None)
-        # should be the same
-        partner = self.partner or cart.partner_id
+        partner = cart.partner_id or self.partner
         partner_values = partner._convert_to_write(partner._cache)
-        had_delivery_line = any(cart.order_line.mapped("is_delivery"))
-        with self.env.do_in_draft():
-            yield cart
-            # Remove the delivery line
-            cart._delivery_unset()
-            # Restore values
-            cart.update(cart_values)
+        with partner.env.do_in_draft():
+            yield
             partner.update(partner_values)
-            # Re-set delivery (if previously set)
-            if had_delivery_line:
-                cart.delivery_set()
-
-    def get_cart_price_by_country(self, **params):
-        """
-        Get the cart price by country/zip.
-        The cart is not updated with the given country. The change is done
-        only in memory.
-        :param params: dict
-        :return: dict
-        """
-        country = self._load_country(params)
-        zip_code = self._load_zip_code(params)
-        with self._simulate_delivery_cost(self._get()) as cart:
-            # Edit country and zip
-            # Even if some info are not provided, we have to fill them
-            # Ex: if the zip code is not provided, we have to do the
-            # simulation with an empty zip code on the partner. Because his
-            # current zip could be related to another country and simulate
-            # a wrong price.
-            cart.partner_id.update({"country_id": country.id, "zip": zip_code})
-            cart.delivery_set()
-            json_cart = self._to_json(cart)
-        return json_cart
 
     # Validator
     def _validator_apply_delivery_method(self):
@@ -104,17 +90,10 @@ class CartService(Component):
         }
 
     def _validator_get_delivery_methods(self):
-        return {}
-
-    def _validator_get_cart_price_by_country(self):
-        """
-
-        :return: dict
-        """
         return {
             "country_id": {
                 "coerce": to_int,
-                "required": True,
+                "required": False,
                 "type": "integer",
             },
             "zip_code": {"required": False, "type": "string"},

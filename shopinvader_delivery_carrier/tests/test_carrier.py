@@ -12,6 +12,7 @@ class CarrierCase(CommonConnectedCartCase):
         self.free_carrier = self.env.ref("delivery.free_delivery_carrier")
         self.poste_carrier = self.env.ref("delivery.delivery_carrier")
         self.product_1 = self.env.ref("product.product_product_4b")
+        self.precision = 2
 
     def extract_cart(self, response):
         self.shopinvader_session["cart_id"] = response["set_session"][
@@ -137,10 +138,7 @@ class CarrierCase(CommonConnectedCartCase):
         nb_lines_before = self.env["sale.order.line"].search_count([])
         self.service.shopinvader_session.update({"cart_id": self.cart.id})
         params = {"country_id": belgium.id}
-        result_get = self.service.dispatch("search")
-        result = self.service.dispatch(
-            "get_cart_price_by_country", params=params
-        )
+        result = self.service.dispatch("get_delivery_methods", params=params)
         self.assertEquals(self.cart.name, cart_values_before.get("name", ""))
         self.cart.read()
         cart_values_after = self.cart._convert_to_write(self.cart._cache)
@@ -159,38 +157,35 @@ class CarrierCase(CommonConnectedCartCase):
             )
         self.assertEquals(self.cart.partner_id, partner)
         self.assertEquals(french_country, partner.country_id)
-        result_data, result_get_data = self._remove_allowed_differences(
-            result, result_get
-        )
-        self.assertEquals(result_data, result_get_data)
+        self._check_carriers(result)
 
-    def _remove_allowed_differences(self, result, result_get):
+    def _check_carriers(self, result):
         """
-        Remove allowed differences between 2 given dict.
-        :param result:
-        :param result_get:
-        :return:
+        Check carrier for current cart based on given result list of dict.
+        :param result: list of dict
+        :return: bool
         """
-        # Now check the 2 results/get
-        # But first remove keys who should be different
-        result_data = result.get("data")
-        result_get_data = result_get.get("data")
-        drop_keys = ["amount", "shipping"]
-        for k in drop_keys:
-            result_data.pop(k, None)
-            result_get_data.pop(k, None)
-        invoicing_drop_keys = ["zip", "country"]
-        for k in invoicing_drop_keys:
-            result_data.get("invoicing", {}).get("address", {}).pop(k, None)
-            result_get_data.get("invoicing", {}).get("address", {}).pop(
-                k, None
+        available_carriers = self.backend.carrier_ids.with_context(
+            order_id=self.cart.id
+        ).filtered(lambda c: c.available)
+        self.assertEquals(len(available_carriers), len(result))
+        for carrier_result in result:
+            carrier = available_carriers.filtered(
+                lambda c: c.id == carrier_result.get("id")
             )
-        return result_data, result_get_data
+            self.assertEquals(len(carrier), 1)
+            self.assertAlmostEquals(
+                carrier.price,
+                carrier_result.get("price"),
+                places=self.precision,
+            )
+            self.assertEquals(carrier.name, carrier_result.get("name"))
+        return True
 
     def test_get_cart_price_by_country2(self):
         """
         Check the service get_cart_price_by_country.
-        For this case, the cart have 1 delivery line set (who will be removed)
+        For this case, the cart have 1 delivery line set
         :return:
         """
         french_country = self.env.ref("base.fr")
@@ -210,10 +205,7 @@ class CarrierCase(CommonConnectedCartCase):
         nb_lines_before = self.env["sale.order.line"].search_count([])
         self.service.shopinvader_session.update({"cart_id": self.cart.id})
         params = {"country_id": belgium.id}
-        result_get = self.service.dispatch("search")
-        result = self.service.dispatch(
-            "get_cart_price_by_country", params=params
-        )
+        result = self.service.dispatch("get_delivery_methods", params=params)
         self.assertEquals(self.cart.name, cart_values_before.get("name", ""))
         self.cart.read()
         cart_values_after = self.cart._convert_to_write(self.cart._cache)
@@ -240,7 +232,56 @@ class CarrierCase(CommonConnectedCartCase):
             )
         self.assertEquals(self.cart.partner_id, partner)
         self.assertEquals(french_country, partner.country_id)
-        result_data, result_get_data = self._remove_allowed_differences(
-            result, result_get
-        )
-        self.assertEquals(result_data, result_get_data)
+        self._check_carriers(result)
+
+    def test_get_cart_price_by_country3(self):
+        """
+        Check the service get_cart_price_by_country.
+        For this case, the cart have 1 delivery line set
+        The cart doesn't have a carrier set.
+        :return:
+        """
+        french_country = self.env.ref("base.fr")
+        belgium = self.env.ref("base.be")
+        partner = self.cart.partner_id
+        partner.write({"country_id": french_country.id})
+        self.assertFalse(self.cart.carrier_id)
+        # Force load every fields
+        self.cart.read()
+        cart_values_before = self.cart._convert_to_write(self.cart._cache)
+        cart_values_before.pop("order_line", None)
+        lines = {}
+        for line in self.cart.order_line:
+            line.read()
+            lines.update({line.id: line._convert_to_write(line._cache)})
+        nb_lines_before = self.env["sale.order.line"].search_count([])
+        self.service.shopinvader_session.update({"cart_id": self.cart.id})
+        params = {"country_id": belgium.id}
+        result = self.service.dispatch("get_delivery_methods", params=params)
+        self.assertEquals(self.cart.name, cart_values_before.get("name", ""))
+        self.cart.read()
+        cart_values_after = self.cart._convert_to_write(self.cart._cache)
+        cart_values_after.pop("order_line", None)
+        self.assertDictEqual(cart_values_before, cart_values_after)
+        nb_lines_after = self.env["sale.order.line"].search_count([])
+        self.assertEquals(nb_lines_after, nb_lines_before)
+        # Ensure lines still ok
+        self.assertEquals(len(lines), len(self.cart.order_line))
+        for line_id, line_values in lines.iteritems():
+            order_line = self.cart.order_line.filtered(
+                lambda l, lid=line_id: l.id == lid
+            )
+            # Because delivery line has changed and the ID doesn't match
+            # anymore.
+            # But should still similar!
+            if not order_line:
+                order_line = self.cart.order_line.filtered(
+                    lambda l: l.is_delivery
+                )
+            order_line.read()
+            self.assertDictEqual(
+                order_line._convert_to_write(order_line._cache), line_values
+            )
+        self.assertEquals(self.cart.partner_id, partner)
+        self.assertEquals(french_country, partner.country_id)
+        self._check_carriers(result)
