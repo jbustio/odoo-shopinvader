@@ -3,12 +3,14 @@
 # @author Sébastien BEAU <sebastien.beau@akretion.com>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from contextlib import contextmanager
+import logging
 
 from odoo.addons.base_rest.components.service import to_int
 from odoo.addons.component.core import Component
 from odoo.exceptions import UserError
 from odoo.tools.translate import _
+
+_logger = logging.getLogger(__name__)
 
 
 class CartService(Component):
@@ -27,19 +29,11 @@ class CartService(Component):
         country = self._load_country(params)
         zip_code = self._load_zip_code(params)
         if country or zip_code:
-            with self._simulate_delivery_cost(cart):
-                # Edit country and zip
-                # Even if some info are not provided, we have to fill them
-                # Ex: if the zip code is not provided, we have to do the
-                # simulation with an empty zip code on the partner. Because his
-                # current zip could be related to another country and simulate
-                # a wrong price.
-                cart.partner_id.update(
-                    {"country_id": country.id, "zip": zip_code}
-                )
-                result = self._get_available_carrier(cart)
-        else:
-            result = self._get_available_carrier(cart)
+            cart = cart.with_context(
+                delivery_force_country_id=country.id,
+                delivery_force_zip_code=zip_code,
+            )
+        result = self._get_available_carrier(cart)
         return result
 
     def apply_delivery_method(self, **params):
@@ -55,23 +49,6 @@ class CartService(Component):
         else:
             self._set_carrier(cart, params["carrier"]["id"])
             return self._to_json(cart)
-
-    @contextmanager
-    def _simulate_delivery_cost(self, cart):
-        """
-        Change the env mode (draft) to avoid real update on the partner.
-        Then, restore the cart with previous values.
-        As the delivery_set function create a new sale.order.line related to
-        the current cart, we have to remove it (by _delivery_unset).
-        So if the cart already had a delivery line, this one will be removed!
-        :param cart: sale.order recordset
-        :return:
-        """
-        partner = cart.partner_id or self.partner
-        partner_values = partner._convert_to_write(partner._cache)
-        with partner.env.do_in_draft():
-            yield
-            partner.update(partner_values)
 
     # Validator
     def _validator_apply_delivery_method(self):

@@ -125,7 +125,31 @@ class CarrierCase(CommonConnectedCartCase):
         """
         french_country = self.env.ref("base.fr")
         belgium = self.env.ref("base.be")
-        partner = self.cart.partner_id
+        self.backend.carrier_ids.write(
+            {"country_ids": [(6, False, [belgium.id, french_country.id])]}
+        )
+        partner = self.service.partner
+        # Use the partner of the service
+        self.cart.write({"partner_id": partner.id})
+        partner.write({"country_id": False})
+        self.cart.write({"carrier_id": False})
+        # Force load every fields
+        self.cart.read()
+        cart_values_before = self.cart._convert_to_write(self.cart._cache)
+        lines = {}
+        for line in self.cart.order_line:
+            line.read()
+            lines.update({line.id: line._convert_to_write(line._cache)})
+        nb_lines_before = self.env["sale.order.line"].search_count([])
+        self.service.shopinvader_session.update({"cart_id": self.cart.id})
+        params = {"country_id": belgium.id}
+        result = self.service.dispatch("get_delivery_methods", params=params)
+        self.cart.read()
+        cart_values_after = self.cart._convert_to_write(self.cart._cache)
+        nb_lines_after = self.env["sale.order.line"].search_count([])
+        self.assertDictEqual(cart_values_before, cart_values_after)
+        self.assertEquals(nb_lines_after, nb_lines_before)
+
         partner.write({"country_id": french_country.id})
         self.cart.write({"carrier_id": self.poste_carrier.id})
         # Force load every fields
@@ -158,6 +182,18 @@ class CarrierCase(CommonConnectedCartCase):
         self.assertEquals(self.cart.partner_id, partner)
         self.assertEquals(french_country, partner.country_id)
         self._check_carriers(result)
+
+    def test_get_cart_price_by_country_anonymous(self):
+        """
+        Check the service get_cart_price_by_country.
+        For this case, the cart doesn't have an existing delivery line.
+        :return:
+        """
+        with self.work_on_services(
+            partner=self.backend.anonymous_partner_id, shopinvader_session={}
+        ) as work:
+            self.service = work.component(usage="cart")
+        self.test_get_cart_price_by_country1()
 
     def _check_carriers(self, result):
         """
