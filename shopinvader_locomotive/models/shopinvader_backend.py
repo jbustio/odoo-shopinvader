@@ -21,6 +21,7 @@ class ShopinvaderBackend(models.Model):
         comodel_name="res.currency", string="Currency"
     )
 
+    @api.multi
     def synchronize_metadata(self):
         return self._export_metafields_store()
 
@@ -30,6 +31,7 @@ class ShopinvaderBackend(models.Model):
             domain = []
         return self.search(domain).synchronize_currency()
 
+    @api.multi
     def synchronize_currency(self):
         return self._export_metafields_store(fields=["currency_ids"])
 
