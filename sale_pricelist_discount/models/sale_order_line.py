@@ -65,6 +65,8 @@ class SaleOrderLine(models.Model):
     @api.multi
     def _get_display_price(self, product):
         # TO DO: move me in master/saas-16 on sale.order
+        if not product:
+            return 0.0
         if self.order_id.pricelist_id.discount_policy == "with_discount":
             return product.with_context(
                 pricelist=self.order_id.pricelist_id.id
