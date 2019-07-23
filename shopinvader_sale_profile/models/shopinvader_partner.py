@@ -107,6 +107,14 @@ class ShopinvaderPartner(models.Model):
                 and p.backend_id.id == b.id
             )
             sale_profile = first(sale_profile)
+        else:
+            pricelist = partner.property_product_pricelist
+            sale_profile = sale_profiles.filtered(
+                lambda p, pl=pricelist, b=backend: not p.fiscal_position_ids
+                and p.pricelist_id.id == pl.id
+                and p.backend_id.id == b.id
+            )
+            sale_profile = first(sale_profile)
         if not sale_profile:
             # Get the default sale profile
             sale_profile = default_sale_profiles.filtered(
@@ -139,7 +147,7 @@ class ShopinvaderPartner(models.Model):
                 force_company=company.id
             )
         domain = [
-            ("fiscal_position_ids", "in", fposition_ids),
+            ("fiscal_position_ids", "in", fposition_ids or False),
             ("pricelist_id", "in", pricelists.ids),
             ("backend_id", "in", backend_ids),
         ]
