@@ -3,7 +3,7 @@
 # Copyright 2018 ACSONE SA/NV (<http://acsone.eu>)
 # @author Sébastien BEAU <sebastien.beau@akretion.com>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
-from odoo.addons.component.core import Component
+from openerp.addons.component.core import Component
 
 
 class ShopInvaderCustomerService(Component):
@@ -17,7 +17,7 @@ class ShopInvaderCustomerService(Component):
         if backend.use_sale_profile:
             params[
                 "property_product_pricelist"
-            ] = backend.sale_profile_ids.filtered("default").id
+            ] = backend.sale_profile_ids.filtered("default").pricelist_id.id
         return params
 
     def _prepare_create_response(self, binding):

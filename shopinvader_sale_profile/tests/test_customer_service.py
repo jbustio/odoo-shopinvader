@@ -3,8 +3,8 @@
 # Copyright 2018 ACSONE SA/NV (<http://acsone.eu>)
 # @author Sébastien BEAU <sebastien.beau@akretion.com>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
-from odoo.addons.shopinvader.tests.common import CommonCase
-from odoo.fields import first
+from openerp.addons.shopinvader.tests.common import CommonCase
+from openerp.fields import first
 
 
 class TestShopInvaderCustomerService(CommonCase):
@@ -42,7 +42,7 @@ class TestShopInvaderCustomerService(CommonCase):
             self.service = work.component(usage="customer")
 
     def _create_partner(self, country, extra=None):
-        data = self.data
+        data = self.data.copy()
         if extra:
             data.update(extra)
         data["country"] = {"id": self.env.ref("base.%s" % country).id}

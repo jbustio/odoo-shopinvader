@@ -5,7 +5,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 {
     "name": "ShopInvader - Sale profile",
-    "version": "10.0.1.0.1",
+    "version": "9.0.1.0.1",
     "depends": ["base", "shopinvader_locomotive", "shopinvader"],
     "author": "Akretion,ACSONE SA/NV",
     "website": "http://www.akretion.com",
@@ -21,5 +21,5 @@
         "demo/shopinvader_sale_profile.xml",
         "demo/account_fiscal_position.xml",
     ],
-    "installable": False,
+    "installable": True,
 }
