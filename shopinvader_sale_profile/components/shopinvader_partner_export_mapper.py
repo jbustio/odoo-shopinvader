@@ -11,5 +11,5 @@ class ShopinvaderPartnerExportMapper(Component):
     _inherit = "shopinvader.partner.export.mapper"
 
     @mapping
-    def sale_profile(self, record):
-        return {"sale_profile": record.sale_profile_id.code}
+    def role(self, record):
+        return {"role": record.sale_profile_id.code}
