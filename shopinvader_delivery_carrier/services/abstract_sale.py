@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
-# Copyright 2019 ACSONE SA/NV (<http://acsone.eu>)
-# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
+# Copyright 2017 Akretion (http://www.akretion.com).
+# @author Sébastien BEAU <sebastien.beau@akretion.com>
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+
 from odoo.addons.component.core import AbstractComponent
 from odoo.tools import float_round
 
