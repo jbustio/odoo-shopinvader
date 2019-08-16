@@ -77,6 +77,26 @@ class AnonymousCartCase(CartCase):
         # It should not create any queue job because the user is not logged
         self.assertEquals(self.env["queue.job"].search_count(domain), 0)
 
+    def test_cart_robustness(self):
+        """
+        The cart used by the service must always be with typology='cart'
+        and state='draft' for the current backend
+        If for some reason, these conditions are no more met, the service
+        silently create a new cart to replace the one into the session
+        """
+        cart = self.service._get()
+        cart_bis = self.service._get()
+        self.assertEqual(cart, cart_bis)
+        cart.write({"state": "sale"})
+        cart_bis = self.service._get()
+        self.assertNotEqual(cart, cart_bis)
+        self.assertEqual(cart_bis.typology, "cart")
+        self.assertEqual(cart_bis.state, "draft")
+        cart = cart_bis
+        cart.write({"typology": "sale"})
+        cart_bis = self.service._get()
+        self.assertNotEqual(cart, cart_bis)
+
 
 class CommonConnectedCartCase(CartCase):
     def setUp(self, *args, **kwargs):
@@ -176,6 +196,23 @@ class ConnectedCartCase(CommonConnectedCartCase):
         )
         domain = [("name", "=", description), ("date_created", ">=", now)]
         self.assertEquals(self.env["queue.job"].search_count(domain), 0)
+
+    def test_cart_robustness(self):
+        """
+        The cart used by the service must always be with typology='cart'
+        and state='draft' for the current backend
+        If for some reason, these conditions are no more met, the service
+        silently create a new cart to replace the one into the session
+        """
+        cart = self.service._get()
+        cart_bis = self.service._get()
+        self.assertEqual(cart, cart_bis)
+        cart.write({"state": "sale"})
+        cart_bis = self.service._get()
+        self.assertNotEqual(cart, cart_bis)
+        self.assertEqual(cart_bis.typology, "cart")
+        self.assertEqual(cart_bis.state, "draft")
+        self.assertEqual(cart_bis.partner_id, self.partner)
 
 
 class ConnectedCartNoTaxCase(CartCase):
