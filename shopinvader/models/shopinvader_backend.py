@@ -88,6 +88,24 @@ class ShopinvaderBackend(models.Model):
     website_public_name = fields.Char(
         help="Public name of your backend/website."
     )
+    clear_cart_options = fields.Selection(
+        selection=[
+            ("delete", "Delete"),
+            ("clear", "Clear"),
+            ("new", "New"),
+            ("new_cancel", "New (cancel previous)"),
+        ],
+        required=True,
+        string="Clear cart",
+        default="clear",
+        help="Action to execute on the cart when the front want to clear the "
+        "current cart:\n"
+        "- Delete: delete the cart (and items);\n"
+        "- Clear: keep the cart but remove items;\n"
+        "- New: keep the cart (and items) and make a new one;"
+        "- New (cancel previous): keep the cart (and items), cancel it "
+        "and make a new one.",
+    )
 
     _sql_constraints = [
         (
