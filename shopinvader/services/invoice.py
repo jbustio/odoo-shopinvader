@@ -15,7 +15,7 @@ from odoo.osv import expression
 
 
 class InvoiceService(Component):
-    _inherit = "base.shopinvader.service"
+    _inherit = "shopinvader.abstract.mail.service"
     _name = "shopinvader.invoice.service"
     _usage = "invoice"
     _expose_model = "account.invoice"
