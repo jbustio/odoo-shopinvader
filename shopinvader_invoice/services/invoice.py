@@ -46,6 +46,8 @@ class InvoiceService(Component):
             "amount_due": {"type": "float"},
             "type": {"type": "string"},
             "state": {"type": "string"},
+            "type_label": {"type": "string"},
+            "state_label": {"type": "string"},
         }
         schema = {
             "size": {"type": "integer"},
@@ -68,6 +70,8 @@ class InvoiceService(Component):
             "amount_total",
             "amount_tax",
             "amount_untaxed",
+            "state",
+            "type",
             "residual:amount_due",
         ]
         return to_parse
@@ -96,8 +100,8 @@ class InvoiceService(Component):
         values = invoice.jsonify(parser)[0]
         values.update(
             {
-                "type": self._get_selection_label(invoice, "type"),
-                "state": self._get_selection_label(invoice, "state"),
+                "type_label": self._get_selection_label(invoice, "type"),
+                "state_label": self._get_selection_label(invoice, "state"),
             }
         )
         return values
