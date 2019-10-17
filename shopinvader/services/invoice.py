@@ -68,6 +68,13 @@ class InvoiceService(Component):
 
     # Private implementation
 
+    def _get_allowed_invoice_states(self):
+        """
+        Get every invoice states allowed to return on the service.
+        :return: list of str
+        """
+        return ["paid"]
+
     def _get_base_search_domain(self):
         """
         This method must provide a domain used to retrieve the requested
@@ -93,8 +100,9 @@ class InvoiceService(Component):
         # and check if the invoice_id is into the list of sale.invoice_ids
         sales = self.env["sale.order"].search(so_domain)
         invoice_ids = sales.mapped("invoice_ids").ids
+        states = self._get_allowed_invoice_states()
         return expression.normalize_domain(
-            [("id", "in", invoice_ids), ("state", "=", "paid")]
+            [("id", "in", invoice_ids), ("state", "in", states)]
         )
 
     def _get_binary_content(self, invoice):
