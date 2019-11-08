@@ -70,6 +70,8 @@ class InvoiceService(Component):
             "amount_total",
             "amount_tax",
             "amount_untaxed",
+            "state",
+            "type",
             "residual:amount_due",
             "type",
             "state",
