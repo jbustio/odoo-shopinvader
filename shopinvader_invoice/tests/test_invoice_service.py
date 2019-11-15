@@ -53,7 +53,7 @@ class TestInvoiceService(CommonCase):
         :return: bool
         """
         # To have them into correct order
-        invoices = invoices.search(self.service._get_base_search_domain())
+        invoices = invoices.search([("id", "in", invoices.ids)])
         self.assertEquals(len(data), len(invoices))
         for current_data, invoice in zip(data, invoices):
             state_label = self._get_selection_label(invoice, "state")
@@ -137,7 +137,8 @@ class TestInvoiceService(CommonCase):
         self.assertEquals(invoice.partner_id, self.service.partner)
         result = self.service.dispatch("search")
         data = result.get("data", [])
-        self._check_data_content(data, invoice)
+        # As the invoice is not paid, it shouldn't be into the data
+        self._check_data_content(data, self.invoice_obj.browse())
         self._make_payment(invoice)
         result = self.service.dispatch("search")
         data = result.get("data", [])
@@ -147,8 +148,7 @@ class TestInvoiceService(CommonCase):
     def test_get_multi_invoice(self):
         """
         Test the get on a logged user.
-        In the first part, the user should have any invoice.
-        But to the second, he should have one.
+        Check the search with many invoices
         :return:
         """
         sale2 = self.sale.copy()
@@ -166,4 +166,26 @@ class TestInvoiceService(CommonCase):
         result = self.service.dispatch("search")
         data = result.get("data", [])
         self._check_data_content(data, invoices)
+        return
+
+    def test_invoice_get(self):
+        """
+        Test the invoice/get on a logged user.
+        Create many invoices to ensure the result will be the one of given id.
+        :return:
+        """
+        sale2 = self.sale.copy()
+        sale3 = self.sale.copy()
+        sale4 = self.sale.copy()
+        invoice1 = self._confirm_and_invoice_sale(self.sale)
+        invoice2 = self._confirm_and_invoice_sale(sale2)
+        invoice3 = self._confirm_and_invoice_sale(sale3)
+        invoice4 = self._confirm_and_invoice_sale(sale4)
+        self.assertEquals(invoice1.partner_id, self.service.partner)
+        self.assertEquals(invoice2.partner_id, self.service.partner)
+        self.assertEquals(invoice3.partner_id, self.service.partner)
+        self.assertEquals(invoice4.partner_id, self.service.partner)
+        result = self.service.dispatch("get", _id=invoice1.id)
+        data = result.get("data", [])
+        self._check_data_content([data], invoice1)
         return
