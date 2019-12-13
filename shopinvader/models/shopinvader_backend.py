@@ -271,19 +271,6 @@ class ShopinvaderBackend(models.Model):
     def bind_all_category(self):
         self._bind_all_content("product.category", "shopinvader.category", [])
 
-    @api.multi
-    def _get_notification_job_priority(self):
-        """
-        Get the priority for notifications.
-        (cfr queue job doc: 0 is the maximum priority; 10 is the default one).
-        Set a higher priority because if we let the default priority and the
-        system has a lot of job to execute, some notification could come late
-        (like emails who contains payment information) and end-customer could
-        lose patience.
-        :return: int
-        """
-        return 2
-
     def _send_notification(self, notification, record):
         self.ensure_one()
         record.ensure_one()
@@ -298,11 +285,15 @@ class ShopinvaderBackend(models.Model):
             record._name,
             record.id,
         )
-        job_priority = self._get_notification_job_priority()
         for notif in notifs:
-            notif.with_delay(
-                description=description, priority=job_priority
-            ).send(record.id)
+            job_priority = notif.queue_job_priority
+            # If < 0 => Live notification
+            if job_priority < 0:
+                notif.send(record.id)
+            else:
+                notif.with_delay(
+                    description=description, priority=job_priority
+                ).send(record.id)
         return True
 
     def _extract_configuration(self):
