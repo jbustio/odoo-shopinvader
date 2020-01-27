@@ -100,6 +100,11 @@ class ShopinvaderBackend(models.Model):
         "statistics reasons. A new cart is created automatically when the "
         "customer will add a new item.",
     )
+    authorize_not_binded_products = fields.Boolean(
+        help="Check this if you want to authorize cart to display products"
+        "that are not binded to this backend. This can be useful if"
+        "you want to modify existing carts from backend."
+    )
 
     _sql_constraints = [
         (
