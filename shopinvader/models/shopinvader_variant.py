@@ -50,10 +50,12 @@ class ShopinvaderVariant(models.Model):
 
     @contextmanager
     @api.multi
-    def _action_product_disabled(self):
+    def _action_product_disabled_enabled(self):
         """
         Action a deactivation of a variant, if every variants are disabled:
         disable the product too.
+        Also when a variant is enabled, the related shopinvader product
+        should be re-enabled too.
         :return:
         """
         product_active_dict = {
@@ -61,9 +63,13 @@ class ShopinvaderVariant(models.Model):
         }
         yield
         for variant in self:
-            if variant.active:
-                continue
             shopinv_product = variant.shopinvader_product_id
+            if variant.active:
+                # If the variant is active and the related shop. product is
+                # not active, we have to active it.
+                if not shopinv_product.active:
+                    shopinv_product.write({"active": True})
+                continue
             # If the product is already disabled, we don't have anything to do!
             if not product_active_dict.get(shopinv_product, True):
                 continue
@@ -78,11 +84,11 @@ class ShopinvaderVariant(models.Model):
     def write(self, vals):
         """
         Inherit to manage behaviour when the variant is disabled.
-        We may habe to disable also the shopinvader.product
+        We may have to disable also the shopinvader.product
         :param vals: dict
         :return: bool
         """
-        with self._action_product_disabled():
+        with self._action_product_disabled_enabled():
             result = super(ShopinvaderVariant, self).write(vals)
         return result
 
