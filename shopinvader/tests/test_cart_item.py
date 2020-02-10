@@ -73,7 +73,9 @@ class AbstractItemCase(object):
             for line in sale.order_line
         )
         nbr_line = len(cart["lines"]["items"])
+        self._init_job_counter()
         cart_simple = self.add_item(self.product_1.id, 2)
+        self._check_nbr_job_created(1)
         self.assertEquals(
             {"id": cart["id"], "qty": qty_before + 2.0}, cart_simple
         )
@@ -84,6 +86,7 @@ class AbstractItemCase(object):
             cart["lines"]["items"][-1], self.product_1.id, 2
         )
         self.check_partner(cart)
+        self._perform_created_job()
 
     def test_add_unbound_item_with_an_existing_cart(self):
         self.sale_line_obj = self.env["sale.order.line"]
