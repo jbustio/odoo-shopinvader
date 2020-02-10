@@ -72,7 +72,9 @@ class AbstractItemCase(object):
             for line in sale.order_line
         )
         nbr_line = len(cart["lines"]["items"])
+        self._init_job_counter()
         cart_simple = self.add_item(self.product_1.id, 2)
+        self.assertEquals(1, len(self.created_jobs))
         self.assertEquals(
             {"id": cart["id"], "qty": qty_before + 2.0}, cart_simple
         )
