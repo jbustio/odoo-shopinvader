@@ -17,3 +17,8 @@ class SaleOrder(models.Model):
         if self.has_promotion_rules:
             self.apply_promotions()
         return result
+
+    @api.multi
+    def shopinvader_recompute(self):
+        self.apply_promotions()
+        return super(SaleOrder, self).shopinvader_recompute()
