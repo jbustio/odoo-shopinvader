@@ -41,8 +41,10 @@ class InvoiceService(Component):
             "number": {"type": "string"},
             "date_invoice": {"type": "string"},
             "amount_total": {"type": "float"},
+            "amount_total_signed": {"type": "float"},
             "amount_tax": {"type": "float"},
             "amount_untaxed": {"type": "float"},
+            "amount_untaxed_signed": {"type": "float"},
             "amount_due": {"type": "float"},
             "type": {"type": "string"},
             "state": {"type": "string"},
@@ -66,8 +68,10 @@ class InvoiceService(Component):
             "number",
             "date_invoice",
             "amount_total",
+            "amount_total_signed",
             "amount_tax",
             "amount_untaxed",
+            "amount_untaxed_signed",
             "residual:amount_due",
         ]
         return to_parse
