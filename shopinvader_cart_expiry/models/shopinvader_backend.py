@@ -48,7 +48,8 @@ class ShopinvaderBackend(models.Model):
         domain = [
             ("shopinvader_backend_id", "=", self.id),
             ("typology", "=", "cart"),
-            ("write_date", "<=", expiry_date),
+            ("state", "=", "draft"),
+            ("last_external_update_date", "<=", expiry_date),
         ]
         return domain
 

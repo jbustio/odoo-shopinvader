@@ -10,6 +10,9 @@ from odoo.addons.base_rest.tests.common import BaseRestCase
 from odoo.addons.component.core import WorkContext
 from odoo.addons.component.tests.common import ComponentMixin
 from odoo.addons.queue_job.job import Job
+from odoo.addons.shopinvader.models.track_external_mixin import (
+    TrackExternalMixin,
+)
 from odoo.tests import SavepointCase
 
 from .. import shopinvader_response
@@ -110,6 +113,15 @@ class CommonCase(SavepointCase, CommonMixin):
         return record._fields.get(field).convert_to_export(
             record[field], record
         )
+
+    def _get_last_external_update_date(self, record):
+        if isinstance(record, TrackExternalMixin):
+            return record.last_external_update_date
+        return False
+
+    def _check_last_external_update_date(self, record, previous_date):
+        if isinstance(record, TrackExternalMixin):
+            self.assertTrue(record.last_external_update_date > previous_date)
 
 
 class ProductCommonCase(CommonCase):
