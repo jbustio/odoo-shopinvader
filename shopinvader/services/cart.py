@@ -271,6 +271,13 @@ class CartService(Component):
             # criteria on the card but in this case, each time the _get method
             # would have been called, a new SQL query would have been done
             cart = self.env["sale.order"].browse(self.cart_id)
+        elif self.partner:
+            cart = self.env["sale.order"].search([
+                ("typology", "=", "cart"),
+                ("shopinvader_backend_id", "=", self.shopinvader_backend.id),
+                ("partner_id", "=", self.partner.id),
+                ("state", "=", "draft")
+            ], limit=1)
         if (
             cart.shopinvader_backend_id == self.shopinvader_backend
             and cart.typology == "cart"
