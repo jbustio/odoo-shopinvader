@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright 2020 ACSONE SA/NV
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+
+<odoo>
+
+    <record model="ir.ui.view" id="sale_order_form_view">
+        <field name="name">sale.order.form (in shopinvader_sale_customer_info)</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" postion="inside">
+                <page string="Customer Information" name="customer_info">
+                    <field name="online_customer_status"/>
+                    <field name="customer_comment"/>
+                </page>
+                <page string="Vendor Information" name="vendor_info">
+                    <field name="vendor_comment"/>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
