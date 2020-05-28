@@ -6,3 +6,4 @@ requests_mock
 vcrpy
 vcrpy-unittest
 openupgradelib @ git+https://github.com/OCA/openupgradelib.git
+odoo12-addon-base_technical_user @ git+https://github.com/ForgeFlow/server-tools@12.0-port-1824
