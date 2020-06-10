@@ -1,6 +1,7 @@
 # Copyright 2017 Akretion (http://www.akretion.com).
 # @author Sébastien BEAU <sebastien.beau@akretion.com>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+import time
 
 from odoo import fields
 
@@ -100,6 +101,7 @@ class AnonymousCartCase(CartCase, CartClearTest):
         super(AnonymousCartCase, self).setUp(*args, **kwargs)
         self.cart = self.env.ref("shopinvader.sale_order_1")
         self.cart.last_external_update_date = fields.Datetime.now()
+        time.sleep(1)
         self.shopinvader_session = {"cart_id": self.cart.id}
         self.partner = self.backend.anonymous_partner_id
         self.product_1 = self.env.ref("product.product_product_4b")
@@ -296,6 +298,7 @@ class CommonConnectedCartCase(CartCase):
         super(CommonConnectedCartCase, self).setUp(*args, **kwargs)
         self.cart = self.env.ref("shopinvader.sale_order_2")
         self.cart.last_external_update_date = fields.Datetime.now()
+        time.sleep(1)
         self.shopinvader_session = {"cart_id": self.cart.id}
         self.partner = self.env.ref("shopinvader.partner_1")
         self.address = self.env.ref("shopinvader.partner_1_address_1")

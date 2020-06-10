@@ -4,7 +4,7 @@
 
 import time
 
-from odoo import exceptions
+from odoo import exceptions, fields
 
 from .common import CommonCase
 
@@ -222,6 +222,7 @@ class AnonymousItemCase(AbstractItemCase, CommonCase):
         super(AnonymousItemCase, cls).setUpClass()
         cls.partner = cls.backend.anonymous_partner_id
         cls.cart = cls.env.ref("shopinvader.sale_order_1")
+        cls.cart.last_external_update_date = fields.Datetime.now()
 
     def setUp(self, *args, **kwargs):
         super(AnonymousItemCase, self).setUp(*args, **kwargs)
@@ -242,6 +243,7 @@ class ConnectedItemCase(AbstractItemCase, CommonCase):
         super(ConnectedItemCase, cls).setUpClass()
         cls.partner = cls.env.ref("shopinvader.partner_1")
         cls.cart = cls.env.ref("shopinvader.sale_order_2")
+        cls.cart.last_external_update_date = fields.Datetime.now()
 
     def setUp(self, *args, **kwargs):
         super(ConnectedItemCase, self).setUp(*args, **kwargs)
