@@ -20,6 +20,13 @@ class TestCartExpiry(CartCase):
         self.sale.write({"last_external_update_date": fields.Datetime.now()})
         self.so_date = self.sale.last_external_update_date
 
+        self.cart = self.env.ref("shopinvader.sale_order_2")
+        self.shopinvader_session = {"cart_id": self.cart.id}
+        with self.work_on_services(
+            partner=None, shopinvader_session=self.shopinvader_session
+        ) as work:
+            self.service = work.component(usage="cart")
+
     def test_cart_expiry_scheduler(self):
         """
         :return:
