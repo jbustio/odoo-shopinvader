@@ -8,3 +8,4 @@ vcrpy
 vcrpy-unittest
 unittest2 # For shopinvader test_controller, which inherits component
 odoo-test-helper
+odoo10-addon-stock_available_base_exclude_location @ git+https://github.com/acsone/stock-logistics-warehouse.git@10.0-add-stock_available_base_exclude_location-dro#subdirectory=setup/stock_available_base_exclude_location
