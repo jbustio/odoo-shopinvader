@@ -1,12 +1,18 @@
 # -*- coding: utf-8 -*-
 # Copyright 2020 ACSONE SA/NV (<http://acsone.eu>)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
-from odoo import api, models
+from odoo import api, fields, models
 from odoo.addons.queue_job.job import job
 
 
 class ShopinvaderBackend(models.Model):
     _inherit = "shopinvader.backend"
+
+    promotion_rule_disabled = fields.Boolean(
+        string="Disable promotion rule",
+        default=False,
+        help="Set to True to disable promotion rules for this backend",
+    )
 
     @api.multi
     @job(default_channel="root.shopinvader")
