@@ -23,14 +23,17 @@ from odoo.addons.shopinvader.models.track_external_mixin import (
 from .. import shopinvader_response
 
 
-class CommonCase(SavepointCase, ComponentMixin):
-    AUTH_API_KEY_NAME = "api_key_shopinvader_test"
+def _install_lang_odoo(env, lang_xml_id):
+    lang = env.ref(lang_xml_id)
+    wizard = env["base.language.install"].create({"lang": lang.code})
+    wizard.lang_install()
+    return lang
 
-    @classmethod
-    def setUpClass(cls):
-        super(CommonCase, cls).setUpClass()
-        cls.setUpComponent()
-        cls.env = cls.env(context={"lang": "en_US", "tracking_disable": True})
+
+class CommonMixin(ComponentMixin):
+    @staticmethod
+    def _setup_backend(cls):
+        cls.env = cls.env(context={"lang": "en_US"})
         cls.backend = cls.env.ref("shopinvader.backend_1")
         cls.product_1 = cls.env.ref("product.product_product_4b")
         cls.precision = cls.env["decimal.precision"].precision_get(
@@ -90,6 +93,35 @@ class CommonCase(SavepointCase, ComponentMixin):
     def _perform_created_job(self):
         for job in self.created_jobs:
             Job.load(self.env, job.uuid).perform()
+            # self._perform_job(job)
+
+    def _bind_products(self, products, backend=None):
+        backend = backend or self.backend
+        bind_wizard_model = self.env["shopinvader.variant.binding.wizard"]
+        bind_wizard = bind_wizard_model.create(
+            {"backend_id": backend.id, "product_ids": [(6, 0, products.ids)]}
+        )
+        bind_wizard.bind_products()
+
+    def _install_lang(self, lang_xml_id):
+        return _install_lang_odoo(self.env, lang_xml_id)
+
+
+class CommonCase(SavepointCase, CommonMixin):
+
+    # by default disable tracking suite-wise, it's a time saver :)
+    tracking_disable = True
+
+    @classmethod
+    def setUpClass(cls):
+        super(CommonCase, cls).setUpClass()
+        cls.env = cls.env(
+            context=dict(
+                cls.env.context, tracking_disable=cls.tracking_disable
+            )
+        )
+        CommonMixin._setup_backend(cls)
+        cls.setUpComponent()
 
     def setUp(self):
         # resolve an inheritance issue (common.SavepointCase does not call
