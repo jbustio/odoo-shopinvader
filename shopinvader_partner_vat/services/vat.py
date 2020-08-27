@@ -43,6 +43,7 @@ class CustomerService(Component):
     def _check_vat_vies(self, vat_number):
         res = {"vat_number": vat_number}
         try:
+            stdnum.eu.vat.vies_wsdl = "https://ec.europa.eu/taxation_customs/vies/checkVatService.wsdl"
             response = stdnum.eu.vat.check_vies(vat_number)
             if response["valid"]:
                 res.update(
