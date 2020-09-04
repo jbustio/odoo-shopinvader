@@ -43,7 +43,15 @@ class DeliveryService(Component):
             "carrier": {
                 "type": "dict",
                 "nullable": True,
-                "schema": {"name": {"type": "string"}},
+                "schema": {
+                    "name": {"type": "string"},
+                    "description_sale": {"type": "string", "nullable": True},
+                    "description_picking": {
+                        "type": "string",
+                        "nullable": True,
+                    },
+                    "description": {"type": "string", "nullable": True},
+                },
             },
             "sale": {
                 "type": "dict",
@@ -84,7 +92,15 @@ class DeliveryService(Component):
         to_parse = [
             "id:delivery_id",
             "carrier_tracking_ref:tracking_reference",
-            ("carrier_id:carrier", ("name",)),
+            (
+                "carrier_id:carrier",
+                [
+                    "name",
+                    "description",
+                    "description_sale",
+                    "description_picking",
+                ],
+            ),
         ]
         return to_parse
 
