@@ -94,3 +94,47 @@ class ResPartner(models.Model):
                     {"partner_shipping_id": cart.partner_shipping_id.id}
                 )
         return True
+
+    def addr_type_display(self):
+        return self._fields["address_type"].convert_to_export(
+            self.address_type, self
+        )
+
+    def action_enable_for_shop(self):
+        self.write({"shopinvader_enabled": True})
+        # TODO: maybe better to hook to an event?
+        for partner in self:
+            if partner.address_type == "profile":
+                notif_type = "customer_validated"
+                backends = partner.mapped("shopinvader_bind_ids.backend_id")
+                recipient = partner
+            elif partner.address_type == "address":
+                notif_type = "address_validated"
+                backends = partner.mapped(
+                    "parent_id.shopinvader_bind_ids.backend_id"
+                )
+                recipient = partner.parent_id
+            recipient._shopinvader_notify(backends, notif_type)
+            name = partner.name or partner.contact_address.replace("\n", " | ")
+            msg_body = _("Shop {addr_type} '{name}' validated").format(
+                addr_type=partner.addr_type_display().lower(), name=name
+            )
+            recipient.message_post(body=msg_body)
+
+    def _shopinvader_notify(self, backends, notif_type):
+        self.ensure_one()
+        for backend in backends:
+            backend._send_notification(notif_type, self)
+
+    def get_customer_partner(self, backend):
+        """Retrieve current partner customer account.
+
+        By default is the same user's partner.
+        Hook here to provide your own behavior.
+
+        This partner is used to provide main account information client side
+        and to assign the partner to the sale order / cart.
+
+        :return: res.partner record.
+        """
+        return self
