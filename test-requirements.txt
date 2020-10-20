@@ -8,3 +8,4 @@ vcrpy
 vcrpy-unittest
 unittest2 # For shopinvader test_controller, which inherits component
 odoo-test-helper
+git+https://github.com/OCA/delivery-carrier@refs/pull/271/head#subdirectory=setup/delivery_carrier_category
