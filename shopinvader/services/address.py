@@ -44,7 +44,7 @@ class AddressService(Component):
         address = self._get(_id)
         address.write(self._prepare_params(params, mode="update"))
         res = self.search()
-        if address.address_type == "profile":
+        if self._store_cache_needed(address):
             res["store_cache"] = {"customer": self._to_json(address)[0]}
         self._post_update(address)
         return res
@@ -59,6 +59,9 @@ class AddressService(Component):
     # The following method are 'private' and should be never never NEVER call
     # from the controller.
     # All params are trusted as they have been checked before
+
+    def _store_cache_needed(self, partner):
+        return partner.address_type == "profile"
 
     # Validator
     def _validator_search(self):
