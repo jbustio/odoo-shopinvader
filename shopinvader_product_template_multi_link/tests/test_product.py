@@ -29,6 +29,9 @@ class ProductLinkCaseBase(ProductCommonCase):
         cls.template_3 = cls.env.ref(
             "shopinvader.product_product_45_product_template"
         )
+        cls.template_55 = cls.env.ref(
+            "shopinvader.product_product_55_product_template"
+        )
         cls.template_3.product_template_link_ids.unlink()
 
         cls.variant_1_1 = cls.template_1.product_variant_ids[0]
@@ -169,3 +172,37 @@ class ProductLinkCase(ProductLinkCaseBase):
                         key
                     ],
                 )
+
+    def test_unbound_product_link(self):
+        main2 = self.template_2.mapped(
+            "shopinvader_bind_ids.shopinvader_variant_ids"
+        ).filtered(lambda x: x.main)
+        main3 = self.template_3.mapped(
+            "shopinvader_bind_ids.shopinvader_variant_ids"
+        ).filtered(lambda x: x.main)
+        values = {
+            "name": "Product Unbound",
+        }
+        template = self.env["product.template"].create(values)
+        self.link_upselling_55_1 = self.env["product.template.link"].create(
+            {
+                "left_product_tmpl_id": template.id,
+                "right_product_tmpl_id": self.template_1.id,
+                "type_id": self.env.ref(
+                    "product_template_multi_link."
+                    "product_template_link_type_up_selling"
+                ).id,
+            }
+        )
+        expected = {
+            "up_selling": [{"id": main2.record_id.id}],
+            "cross_selling": [{"id": main3.record_id.id}],
+        }
+        self.assertEqual(
+            self.shopinvader_variant_1_1.shopinvader_product_id.product_links,
+            expected,
+        )
+        self.assertEqual(
+            self.shopinvader_variant_1_2.shopinvader_product_id.product_links,
+            expected,
+        )

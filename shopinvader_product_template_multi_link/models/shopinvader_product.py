@@ -50,7 +50,9 @@ class ShopinvaderProductLinkMixin(models.AbstractModel):
             grouped[code] |= link
         res = {}
         for code, links in grouped.items():
-            res[code] = [self._get_product_link_data(x) for x in links]
+            res[code] = [
+                y for y in [self._get_product_link_data(x) for x in links] if y
+            ]
         return res
 
     def _product_link_code(self, link):
