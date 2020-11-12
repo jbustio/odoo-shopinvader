@@ -135,3 +135,37 @@ class ProductLinkCase(ProductLinkCaseBase):
         exporter = self.env.ref("shopinvader.ir_exp_shopinvader_variant")
         parser = exporter.get_json_parser()
         self.assertIn("links", self.shopinvader_variant_2_2.jsonify(parser)[0])
+
+    def test_inverse_source_link(self):
+        main2 = self.template_2.mapped(
+            "shopinvader_bind_ids.shopinvader_variant_ids"
+        ).filtered(lambda x: x.main)
+        main3 = self.template_3.mapped(
+            "shopinvader_bind_ids.shopinvader_variant_ids"
+        ).filtered(lambda x: x.main)
+
+        self.link_upselling_3_1 = self.env["product.template.link"].create(
+            {
+                "left_product_tmpl_id": self.template_3.id,
+                "right_product_tmpl_id": self.template_1.id,
+                "type_id": self.env.ref(
+                    "product_template_multi_link."
+                    "product_template_link_type_up_selling"
+                ).id,
+            }
+        )
+        expected = {
+            "up_selling": [
+                {"id": main3.record_id.id},
+                {"id": main2.record_id.id},
+            ],
+            "cross_selling": [{"id": main3.record_id.id}],
+        }
+        for key, item in expected.items():
+            for value in item:
+                self.assertIn(
+                    value,
+                    self.shopinvader_variant_1_1.shopinvader_product_id.product_links[
+                        key
+                    ],
+                )
