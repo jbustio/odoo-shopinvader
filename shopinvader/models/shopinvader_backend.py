@@ -51,8 +51,11 @@ class ShopinvaderBackend(models.Model):
         selection=lambda a: a._get_auth_api_key_name_selection(),
     )
     lang_ids = fields.Many2many("res.lang", string="Lang", required=True)
-    pricelist_id = fields.Many2one("product.pricelist", string="Pricelist")
-
+    pricelist_id = fields.Many2one(
+        "product.pricelist",
+        string="Pricelist",
+        default=lambda self: self._default_pricelist_id(),
+    )
     account_analytic_id = fields.Many2one(
         comodel_name="account.analytic.account",
         string="Analytic account",
@@ -124,6 +127,10 @@ class ShopinvaderBackend(models.Model):
             "An authentication API Key can be used by only one backend.",
         )
     ]
+
+    @api.model
+    def _default_pricelist_id(self):
+        return self.env.ref("product.list0")
 
     @api.model
     def _get_auth_api_key_name_selection(self):
@@ -370,6 +377,18 @@ class ShopinvaderBackend(models.Model):
                 sale
             )
         return True
+
+    @api.model
+    def _get_cart_pricelist(self, partner=None):
+        """Retrieve pricelist to be used for the cart.
+        NOTE: if you change this behavior be aware that
+        the prices displayed on the cart might differ
+        from the ones showed on product details.
+        This is because product info comes from indexes
+        which are completely agnostic in regard to specific partner info.
+        """
+        # There must be a pricelist somehow: safe fallback to default Odoo one
+        return self.pricelist_id or self._default_pricelist_id()
 
     @api.model
     def _launch_sale_price_update(self, domain=False):
