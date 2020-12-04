@@ -39,7 +39,8 @@ class InvaderController(main.RestController):
             ]
             partner = partner_model.search(partner_domain)
             if len(partner) == 1:
-                return partner.record_id
+                cls._validate_partner(backend, partner)
+                return partner
             else:
                 _logger.warning("Wrong HTTP_PARTNER_EMAIL, header ignored")
                 if len(partner) > 1:
@@ -51,7 +52,7 @@ class InvaderController(main.RestController):
                 # Could be because the email is not related to a partner or
                 # because the partner is inactive
                 raise MissingError(_("The given partner is not found!"))
-        return partner_model.browse([]).record_id
+        return partner_model.browse([])
 
     @classmethod
     def _get_shopinvader_backend_from_request(cls):
@@ -76,9 +77,14 @@ class InvaderController(main.RestController):
         """
         res = super(InvaderController, self)._get_component_context()
         headers = request.httprequest.environ
-        res["partner"] = self._get_partner_from_headers(headers)
-        # allow having a different partner for the user in extending modules
-        res["partner_user"] = res["partner"]
+        # TODO: all services should rely on shopinvader partner
+        # rather than the real partner
+        shopinvader_partner = self._get_partner_from_headers(headers)
+        res["invader_partner"] = shopinvader_partner
+        partner = shopinvader_partner.record_id
+        res["partner_user"] = partner
+        # The partner user for the main account or for sale order may differ.
+        res["partner"] = partner.get_shop_partner(res["shopinvader_backend"])
         res[
             "shopinvader_session"
         ] = self._get_shopinvader_session_from_headers(headers)

@@ -25,6 +25,8 @@ class CustomerService(Component):
     def create(self, **params):
         vals = self._prepare_params(params)
         binding = self.env["shopinvader.partner"].create(vals)
+        # TODO: move to `service._[init|update]_context` to centralize it
+        self.work.invader_partner = binding
         self.work.partner = binding.record_id
         self._send_welcome_message(binding)
         return self._prepare_create_response(binding)
