@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright 2021 ACSONE SA/NV
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<odoo>
+    <record model="ir.ui.view" id="shopinvader_security_token_form_view">
+        <field name="name">shopinvader.security.token.form (in shopinvader_validation_token)</field>
+        <field name="model">shopinvader.security.token</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="email"/>
+                            <field name="shopinvader_backend_id"/>
+                            <field name="token"/>
+                            <field name="expiration_datetime"/>
+                        </group>
+                        <group>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="shopinvader_security_token_tree_view">
+        <field name="name">shopinvader.security.token.tree (in shopinvader_validation_token)</field>
+        <field name="model">shopinvader.security.token</field>
+        <field name="arch" type="xml">
+            <tree editable="bottom">
+                <field name="email"/>
+                <field name="shopinvader_backend_id"/>
+                <field name="token"/>
+                <field name="expiration_datetime"/>
+                <field name="active"/>
+            </tree>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="shopinvader_security_token_action">
+        <field name="name">shopinvader.security.token.action</field>
+        <field name="res_model">shopinvader.security.token</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>
