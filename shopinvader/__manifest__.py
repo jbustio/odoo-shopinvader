@@ -63,17 +63,11 @@
     ],
     "demo": [
         "demo/account_demo.xml",
-        "demo/pricelist_demo.xml",
         "demo/auth_api_key_demo.xml",
         "demo/backend_demo.xml",
         "demo/partner_demo.xml",
         "demo/sale_demo.xml",
-        "demo/email_demo.xml",
-        "demo/notification_demo.xml",
         "demo/product_filter_demo.xml",
-        "demo/product_category_demo.xml",
-        "demo/product_attribute_value_demo.xml",
-        "demo/product_product_demo.xml",
     ],
     "qweb": [],
 }

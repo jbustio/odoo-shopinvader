@@ -13,6 +13,5 @@
         "shopinvader_search_engine",
     ],
     "data": ["views/shopinvader_backend.xml"],
-    "demo": ["demo/shopinvader_assortment_demo.xml"],
     "installable": True,
 }
