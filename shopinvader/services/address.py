@@ -85,7 +85,6 @@ class AddressService(Component):
             "type": {
                 "type": "string",
                 "allowed": self._get_allowed_type(),
-                "default": "contact",
             },
             "street": {"type": "string", "required": True, "empty": False},
             "street2": {"type": "string", "nullable": True},
