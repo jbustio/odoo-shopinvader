@@ -29,7 +29,9 @@ class ShopinvaderPartner(models.Model):
         string="Partner Email",
     )
     role = fields.Char(compute="_compute_role")
-    state = fields.Selection(selection="_select_state", default=STATE_ACTIVE,)
+    state = fields.Selection(
+        selection="_select_state", default=STATE_ACTIVE, string="Binding State"
+    )
     # Common interface to mimic the same behavior as res.partner.
     # On the binding we have a selection for the state
     # and we can set the value for each backend.
