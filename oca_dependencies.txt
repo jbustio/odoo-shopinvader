@@ -1,0 +1,1 @@
+sale-workflow https://github.com/acsone/sale-workflow 14.0-mig-sale_stock_picking_note
