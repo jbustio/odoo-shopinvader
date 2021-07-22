@@ -10,7 +10,7 @@ class TestShopinvaderBackendTest(ProductCommonCase, ProductImageCommonCase):
     """
 
     def setUp(self):
-        super(TestShopinvaderBackendTest, self).setUp()
+        super().setUp()
         self.env.ref("base.user_demo").write(
             {
                 "groups_id": [

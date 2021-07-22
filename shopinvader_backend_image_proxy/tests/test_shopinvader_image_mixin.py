@@ -4,13 +4,13 @@ from odoo.addons.shopinvader.tests.common import ProductCommonCase
 from odoo.addons.storage_image_product.tests.common import ProductImageCommonCase
 
 
-class TestShopinvaderImageMixin(ProductCommonCase, ProductImageCommonCase):
+class TestShopinvaderImageMixin(ProductImageCommonCase, ProductCommonCase):
     """
     Tests for shopinvader.image.mixin
     """
 
     def setUp(self):
-        super(TestShopinvaderImageMixin, self).setUp()
+        super().setUp()
         self.backend.write({"image_proxy_url": "http://custom.website.dev"})
         self.env.ref("base.user_demo").write(
             {
