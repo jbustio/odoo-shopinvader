@@ -16,7 +16,7 @@ class CommonValidationToken(CommonCase):
         return ""
 
     def setUp(self, *args, **kwargs):
-        super(CommonValidationToken, self).setUp(*args, **kwargs)
+        super().setUp(*args, **kwargs)
         self.data = {
             "email": "new@customer.example.com",
             "name": "Purple",
