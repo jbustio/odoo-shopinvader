@@ -1,12 +1,10 @@
-# -*- coding: utf-8 -*-
 # Copyright 2021 ACSONE SA/NV (<http://acsone.eu>)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 from uuid import uuid4
 
 from odoo import exceptions
-from odoo.addons.shopinvader_validation_token.tests.common import (
-    CommonValidationToken,
-)
+
+from odoo.addons.shopinvader_validation_token.tests.common import CommonValidationToken
 
 
 class TestGuestService(CommonValidationToken):
@@ -17,7 +15,7 @@ class TestGuestService(CommonValidationToken):
         return "partner_token_guest"
 
     def setUp(self, *args, **kwargs):
-        super(TestGuestService, self).setUp(*args, **kwargs)
+        super().setUp(*args, **kwargs)
         self.shopinvader_partner_data.update({"is_guest": False})
         self.backend.is_guest_mode_allowed = True
 
@@ -56,9 +54,7 @@ class TestGuestService(CommonValidationToken):
         self._enable_security_token()
         token = str(uuid4())
         with self._patch_get_new_token(forced_token=token):
-            self.service.dispatch(
-                "security_code_enabled", params=self.data.copy()
-            )
+            self.service.dispatch("security_code_enabled", params=self.data.copy())
             data = self.data.copy()
             data.update({"token": token})
             result = self.service.dispatch("create", params=data)
@@ -73,9 +69,7 @@ class TestGuestService(CommonValidationToken):
         self._enable_security_token()
         token = str(uuid4())
         with self._patch_get_new_token(forced_token=token):
-            self.service.dispatch(
-                "security_code_enabled", params=self.data.copy()
-            )
+            self.service.dispatch("security_code_enabled", params=self.data.copy())
             data = self.data.copy()
             data.update({"token": token})
             result = self.service.dispatch("create", params=data.copy())
