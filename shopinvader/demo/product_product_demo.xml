@@ -200,19 +200,19 @@
             eval="[{
                 'xml_id': 'shopinvader.product_template_chair_mid_century_attribute_color_blue',
                 'record': obj().env.ref('shopinvader.product_template_chair_mid_century_product_template_attribute_line_color').product_template_value_ids[0],
-                'noupdate': True,
+                'noupdate': False,
             }, {
                 'xml_id': 'shopinvader.product_template_chair_mid_century_attribute_color_white',
                 'record': obj().env.ref('shopinvader.product_template_chair_mid_century_product_template_attribute_line_color').product_template_value_ids[1],
-                'noupdate': True,
+                'noupdate': False,
             }, {
                 'xml_id': 'shopinvader.product_template_chair_mid_century_attribute_color_black',
                 'record': obj().env.ref('shopinvader.product_template_chair_mid_century_product_template_attribute_line_color').product_template_value_ids[2],
-                'noupdate': True,
+                'noupdate': False,
             }, {
                 'xml_id': 'shopinvader.product_template_chair_mid_century_attribute_color_red',
                 'record': obj().env.ref('shopinvader.product_template_chair_mid_century_product_template_attribute_line_color').product_template_value_ids[3],
-                'noupdate': True,
+                'noupdate': False,
             },]"
         />
         </function>
