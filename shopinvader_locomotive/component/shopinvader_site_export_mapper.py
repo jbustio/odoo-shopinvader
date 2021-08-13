@@ -34,7 +34,12 @@ class ShopinvaderSiteExportMapper(Component):
             "available_countries": self._m2m_to_external(
                 record,
                 "allowed_country_ids",
-                ["id", "name", ("state_ids:states", ["code", "name"])],
+                [
+                    "id",
+                    "name",
+                    ("state_ids:states", ["code", "name"]),
+                    ("country_group_ids:groups", ["id", "name"]),
+                ],
             )
         }
 
