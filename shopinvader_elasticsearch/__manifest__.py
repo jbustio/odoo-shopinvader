@@ -4,7 +4,7 @@
 
 {
     "name": "Shopinvader Elasticsearch",
-    "summary": """
+    "description": """
         Shopinvader Elasticsearch Connector""",
     "version": "10.0.1.0.4",
     "license": "AGPL-3",
