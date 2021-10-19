@@ -7,10 +7,7 @@ from odoo import _, api, exceptions, fields, models
 
 
 class ShopinvaderSaleProfile(models.Model):
-    """
-    Model to represent a customer sale profile with a specific pricelist
-    per backend.
-    """
+    """Represent a customer sale profile with a specific pricelist  per backend."""
 
     _name = "shopinvader.sale.profile"
     _description = "Shopinvader Customer profile"
@@ -48,7 +45,6 @@ class ShopinvaderSaleProfile(models.Model):
         )
     ]
 
-    @api.multi
     @api.constrains("default", "backend_id")
     def _check_default(self):
         """
@@ -65,9 +61,7 @@ class ShopinvaderSaleProfile(models.Model):
         groups_data = self.env["shopinvader.sale.profile"].read_group(
             domain, fields=[group_by], groupby=group_by, lazy=False
         )
-        count_data = {
-            item[group_by][0]: item.get("__count", 0) for item in groups_data
-        }
+        count_data = {item[group_by][0]: item.get("__count", 0) for item in groups_data}
         for record in self:
             if record.default:
                 nb_default = count_data.get(record.backend_id.id, 0)
@@ -75,7 +69,6 @@ class ShopinvaderSaleProfile(models.Model):
                     message = _("Only one default profile is authorized")
                     raise exceptions.ValidationError(message)
 
-    @api.multi
     @api.constrains("backend_id", "pricelist_id", "fiscal_position_ids")
     def _check_unique_pricelist_fposition(self):
         """

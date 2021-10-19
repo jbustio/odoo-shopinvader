@@ -17,7 +17,7 @@ ShopInvader - Sale profile
     :target: https://github.com/shopinvader/odoo-shopinvader/tree/10.0/shopinvader_sale_profile
     :alt: shopinvader/odoo-shopinvader
 
-|badge1| |badge2| |badge3| 
+|badge1| |badge2| |badge3|
 
 This ShopInvader submodule give the possibility to specify some
 sale profiles (with pricelist per profile) per backend to apply on
@@ -34,7 +34,7 @@ Bug Tracker
 Bugs are tracked on `GitHub Issues <https://github.com/shopinvader/odoo-shopinvader/issues>`_.
 In case of trouble, please check there if your issue has already been reported.
 If you spotted it first, help us smashing it by providing a detailed and welcomed
-`feedback <https://github.com/shopinvader/odoo-shopinvader/issues/new?body=module:%20shopinvader_sale_profile%0Aversion:%2010.0%0A%0A**Steps%20to%20reproduce**%0A-%20...%0A%0A**Current%20behavior**%0A%0A**Expected%20behavior**>`_.
+`feedback <https://github.com/shopinvader/odoo-shopinvader/issues/new?body=module:%20shopinvader_sale_profile%0Aversion:%2014.0%0A%0A**Steps%20to%20reproduce**%0A-%20...%0A%0A**Current%20behavior**%0A%0A**Expected%20behavior**>`_.
 
 Do not contact contributors directly about support or help with technical issues.
 
@@ -54,6 +54,7 @@ Contributors
 * Cédric PIGEON <cedric.pigeon@acsone.eu>
 * Sebastien BEAU <sebastien.beau@akretion.com>
 * Benoît GUILLOT <benoit.guillot@akretion.com>
+* Simone Orsi <simahawk@gmail.com>
 
 Maintainers
 ~~~~~~~~~~~

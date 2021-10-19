@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright 2018 Akretion (http://www.akretion.com).
 # Copyright 2018 ACSONE SA/NV (<http://acsone.eu>)
 # @author Sébastien BEAU <sebastien.beau@akretion.com>
@@ -12,10 +11,10 @@ class TestShopinvaderVariant(ProductCommonCase):
     """
 
     def _check_price(self, computed_price, expected_price):
-        for key, _expected_dict in expected_price.items():
+        for key, expected_value in expected_price.items():
             self.assertIn(key, computed_price.keys())
             price_value = computed_price[key]
-            for value_key, expected_value in price_value.items():
+            for value_key, expected_value in expected_value.items():
                 self.assertEqual(expected_value, price_value[value_key])
 
     def test_price_with_sale_profile(self):
@@ -23,7 +22,7 @@ class TestShopinvaderVariant(ProductCommonCase):
         Test if price field is correctly computed
         :return: bool
         """
-        self.backend.write({"use_sale_profile": True, "pricelist_id": False})
+        self.backend.write({"use_sale_profile": True})
         # Expecting values
         expected_price = {
             "public_tax_exc": {"tax_included": False, "value": 652.17},
