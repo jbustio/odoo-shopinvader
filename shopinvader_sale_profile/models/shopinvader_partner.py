@@ -75,7 +75,7 @@ class ShopinvaderPartner(models.Model):
             shopinv_partners = self.filtered(
                 lambda p, c=company: p.backend_id.company_id.id == c.id
             )
-            shopinv_partners = shopinv_partners.with_company(company)
+            shopinv_partners = shopinv_partners.with_context(force_company=company.id)
             for binding in shopinv_partners:
                 sale_profile = sale_profile_obj.browse()
                 # Only if the related backend use sale profiles
@@ -147,7 +147,7 @@ class ShopinvaderPartner(models.Model):
         """
         sale_profile_obj = self.env["shopinvader.sale.profile"]
         if company:
-            sale_profile_obj = sale_profile_obj.with_company(company)
+            sale_profile_obj = sale_profile_obj.with_context(force_company=company.id)
         domain = [
             "|",
             ("fiscal_position_ids", "in", fposition_ids),
@@ -183,7 +183,7 @@ class ShopinvaderPartner(models.Model):
         """
         fposition_obj = self.env["account.fiscal.position"]
         if company:
-            fposition_obj = fposition_obj.with_company(company)
+            fposition_obj = fposition_obj.with_context(force_company=company.id)
         fposition_by_partner = {}
         for partner in partners:
             fpos = fposition_obj.get_fiscal_position(partner.id, delivery_id=partner.id)
