@@ -14,7 +14,7 @@ class ShopinvaderSaleProfile(models.Model):
     _rec_name = "code"
 
     backend_id = fields.Many2one(
-        "shopinvader.backend", "Backend", required=True, index=True
+        "shopinvader.backend", "Backend", ondelete="cascade", index=True
     )
     pricelist_id = fields.Many2one(
         "product.pricelist",
