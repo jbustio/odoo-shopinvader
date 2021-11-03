@@ -69,7 +69,12 @@ class InvoiceService(Component):
         """
         invoice_schema = {
             "invoice_id": {"type": "integer"},
-            "number": {"type": "string"},
+            # The number could be empty if it's an old invoice with the related field empty
+            "number": {
+                "type": "string",
+                "required": False,
+                "nullable": True,
+            },
             "date_invoice": {"type": "string"},
             "date_due": {"type": "string"},
             "amount_total": {"type": "float"},
