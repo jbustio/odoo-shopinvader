@@ -42,7 +42,9 @@ class CommonMixin(ComponentMixin):
         cls.backend.bind_all_product()
         cls.shopinvader_session = {}
         cls.api_key = "myApiKey"
-        cls.auth_api_key_name = cls.AUTH_API_KEY_NAME
+        cls.auth_api_key_name = getattr(
+            cls, "AUTH_API_KEY_NAME", "api_key_shopinvader_test"
+        )
         if cls.auth_api_key_name not in serv_config.sections():
             serv_config.add_section(cls.auth_api_key_name)
             serv_config.set(cls.auth_api_key_name, "user", "admin")
