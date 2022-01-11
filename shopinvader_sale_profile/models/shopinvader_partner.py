@@ -75,7 +75,9 @@ class ShopinvaderPartner(models.Model):
             shopinv_partners = self.filtered(
                 lambda p, c=company: p.backend_id.company_id.id == c.id
             )
-            shopinv_partners = shopinv_partners.with_context(force_company=company.id)
+            shopinv_partners = shopinv_partners.with_context(
+                force_company=company.id
+            )
             for binding in shopinv_partners:
                 sale_profile = sale_profile_obj.browse()
                 # Only if the related backend use sale profiles
@@ -136,7 +138,9 @@ class ShopinvaderPartner(models.Model):
                 raise exceptions.UserError(message)
         return sale_profile
 
-    def _get_sale_profiles(self, backend_ids, pricelists, fposition_ids, company=False):
+    def _get_sale_profiles(
+        self, backend_ids, pricelists, fposition_ids, company=False
+    ):
         """Get sale profiles for given backends, fiscal positions, pricelists.
 
         :param fposition_ids: list of int
@@ -147,7 +151,9 @@ class ShopinvaderPartner(models.Model):
         """
         sale_profile_obj = self.env["shopinvader.sale.profile"]
         if company:
-            sale_profile_obj = sale_profile_obj.with_context(force_company=company.id)
+            sale_profile_obj = sale_profile_obj.with_context(
+                force_company=company.id
+            )
         domain = [
             "|",
             ("fiscal_position_ids", "in", fposition_ids),
@@ -170,7 +176,9 @@ class ShopinvaderPartner(models.Model):
             ("default", "=", True),
             ("backend_id", "in", backend_ids),
         ]
-        default_sale_profiles = sale_profile_obj.search(domain_default_profiles)
+        default_sale_profiles = sale_profile_obj.search(
+            domain_default_profiles
+        )
         return default_sale_profiles
 
     @api.model
@@ -183,10 +191,14 @@ class ShopinvaderPartner(models.Model):
         """
         fposition_obj = self.env["account.fiscal.position"]
         if company:
-            fposition_obj = fposition_obj.with_context(force_company=company.id)
+            fposition_obj = fposition_obj.with_context(
+                force_company=company.id
+            )
         fposition_by_partner = {}
         for partner in partners:
-            fpos = fposition_obj.get_fiscal_position(partner.id, delivery_id=partner.id)
+            fpos = fposition_obj.get_fiscal_position(
+                partner.id, delivery_id=partner.id
+            )
             if fpos:
                 fposition_by_partner[partner.id] = fpos.id
         return fposition_by_partner

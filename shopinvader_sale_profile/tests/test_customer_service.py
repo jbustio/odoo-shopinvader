@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Copyright 2018 Akretion (http://www.akretion.com).
 # Copyright 2018 ACSONE SA/NV (<http://acsone.eu>)
 # @author Sébastien BEAU <sebastien.beau@akretion.com>
@@ -36,7 +37,9 @@ class TestShopInvaderCustomerService(CommonCase):
         }
         self.backend.write({"use_sale_profile": True})
         session = self.shopinvader_session
-        with self.work_on_services(partner=None, shopinvader_session=session) as work:
+        with self.work_on_services(
+            partner=None, shopinvader_session=session
+        ) as work:
             self.service = work.component(usage="customer")
 
     def _create_partner(self, country, extra=None):
@@ -87,14 +90,22 @@ class TestShopInvaderCustomerService(CommonCase):
         The computation should assign the right profile.
         :return: bool
         """
-        shopinvader_partner = self._create_partner("fr", extra={"vat": "BE0477472701"})
+        shopinvader_partner = self._create_partner(
+            "fr", extra={"vat": "BE0477472701"}
+        )
         # Note for now we do not have automatic rule to
         # set a specific pricelist depending on vat number
         # so we set it manually
         shopinvader_partner.write(
-            {"property_product_pricelist": self.env.ref("shopinvader.pricelist_1").id}
+            {
+                "property_product_pricelist": self.env.ref(
+                    "shopinvader.pricelist_1"
+                ).id
+            }
         )
-        self.assertEqual(shopinvader_partner.sale_profile_id, self.profile_pro_tax_exc)
+        self.assertEqual(
+            shopinvader_partner.sale_profile_id, self.profile_pro_tax_exc
+        )
 
     def test_create_customer_exclude_sale_profile(self):
         """

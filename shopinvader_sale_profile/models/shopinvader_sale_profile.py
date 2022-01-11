@@ -61,7 +61,9 @@ class ShopinvaderSaleProfile(models.Model):
         groups_data = self.env["shopinvader.sale.profile"].read_group(
             domain, fields=[group_by], groupby=group_by, lazy=False
         )
-        count_data = {item[group_by][0]: item.get("__count", 0) for item in groups_data}
+        count_data = {
+            item[group_by][0]: item.get("__count", 0) for item in groups_data
+        }
         for record in self:
             if record.default:
                 nb_default = count_data.get(record.backend_id.id, 0)
