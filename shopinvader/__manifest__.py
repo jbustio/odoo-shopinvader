@@ -18,6 +18,7 @@
         "bin": [],
     },
     "depends": [
+        "base_partition",  # filtered_domain
         "base_rest",
         "auth_api_key",
         "base_jsonify",
