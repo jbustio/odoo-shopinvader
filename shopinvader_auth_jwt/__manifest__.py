@@ -9,12 +9,7 @@
     "author": "ACSONE SA/NV",
     "website": "https://github.com/shopinvader/odoo-shopinvader",
     "license": "AGPL-3",
-    "depends": [
-        "shopinvader",
-        "auth_jwt",
-    ],
-    "data": [
-        "views/shopinvader_backend.xml",
-    ],
+    "depends": ["shopinvader", "auth_jwt"],
+    "data": ["views/shopinvader_backend.xml"],
     "demo": [],
 }
