@@ -167,7 +167,7 @@ class BaseShopinvaderService(AbstractComponent):
         )
         return defaults
 
-    def _is_logged(self):
+    def _is_logged_in(self):
         """
         Check if the current partner is a real partner (not the anonymous one
         and not empty)
@@ -180,6 +180,10 @@ class BaseShopinvaderService(AbstractComponent):
         ):
             logged = True
         return logged
+
+    def _is_logged(self):
+        # _logger.warning("DEPRECATED: You should use `self._is_logged_in()`")
+        return self._is_logged_in()
 
     @property
     def shopinvader_response(self):
