@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Copyright 2018 Akretion (http://www.akretion.com).
 # @author Sébastien BEAU <sebastien.beau@akretion.com>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
@@ -8,7 +9,9 @@ from odoo.addons.shopinvader.tests.common import ProductCommonCase
 class ProductCase(ProductCommonCase):
     def setUp(self):
         super(ProductCase, self).setUp()
-        self.attr_set = self.env.ref("product_attribute_set.computer_attribute_set")
+        self.attr_set = self.env.ref(
+            "product_attribute_set.computer_attribute_set"
+        )
         self.processor = self.env.ref(
             "product_attribute_set.computer_processor_attribute_option_1"
         )
@@ -79,16 +82,15 @@ class ProductCase(ProductCommonCase):
 
     def test_product_attributes_empty_select(self):
         self.product.write(
-            {
-                "attribute_set_id": self.attr_set.id,
-                "x_processor": False,
-            }
+            {"attribute_set_id": self.attr_set.id, "x_processor": False}
         )
 
         self.assertEqual(self.shopinvader_variant.attributes["processor"], "")
 
         processor_field = {}
-        for field in self.shopinvader_variant.structured_attributes[0]["fields"]:
+        for field in self.shopinvader_variant.structured_attributes[0][
+            "fields"
+        ]:
             if field["key"] == "processor":
                 processor_field = field
         self.assertEqual(
