@@ -1,4 +1,5 @@
 locomotivecms @ git+https://github.com/shopinvader/locomotivecms-python-client.git
+odoo10-addon-auth-jwt @ git+https://github.com/oca/server-auth.git@refs/pull/281/head#subdirectory=setup/auth_jwt
 # test requirements
 requests_mock
 vcrpy
