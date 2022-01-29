@@ -25,6 +25,8 @@ class ShopinvaderBackend(models.Model):
             aud = [aud]
         backends = self.search([("jwt_aud", "in", aud)])
         if len(backends) != 1:
-            _logger.warning("%d backends found for JWT aud %r", aud)
+            _logger.warning(
+                "%d backends found for JWT aud %r", len(backends), aud
+            )
             return self.browse([])
         return backends
