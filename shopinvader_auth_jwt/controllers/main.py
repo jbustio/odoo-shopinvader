@@ -13,7 +13,7 @@ class InvaderController(main.RestController):
     _collection_name = "shopinvader.backend"
     _default_auth = "jwt_shopinvader"
     _default_save_session = False
-    _cors = "*"
+    _default_cors = "*"
     _component_context_provider = "shopinvader_auth_jwt_context_provider"
 
     @route(["/shopinvader/<service>/<int:_id>/download"], methods=["GET"])
