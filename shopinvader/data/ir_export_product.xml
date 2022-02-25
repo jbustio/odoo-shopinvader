@@ -12,6 +12,14 @@
         <field name="export_id" ref="ir_exp_shopinvader_variant"/>
     </record>
 
+    <!-- forward compatiblity. Everything should be referenced by id field -->
+    <record id="ir_exp_shopinvader_category_id" model="ir.exports.line">
+        <field name="name">object_id</field>
+        <field name="alias">object_id:id</field>
+        <field name="export_id" ref="ir_exp_shopinvader_variant"/>
+    </record>
+
+
     <record id="ir_exp_shopinvader_variant_model_name" model="ir.exports.line">
         <field name="name">shopinvader_product_id/shopinvader_display_name</field>
         <field name="alias">shopinvader_product_id:model/shopinvader_display_name:name</field>
