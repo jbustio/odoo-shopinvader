@@ -22,7 +22,7 @@ class WishlistService(Component):
     # All params are untrusted so please check it !
 
     @restapi.method(
-        [(["/<int:_id>/get/"], "GET")],
+        [(["/<int:_id>/", "/<int:_id>/get/"], "GET")],
         input_param=restapi.CerberusValidator("_validator_empty"),
         output_param=restapi.CerberusValidator("_wishlist_output_schema"),
     )
@@ -40,7 +40,7 @@ class WishlistService(Component):
 
     # pylint: disable=method-required-super
     @restapi.method(
-        [(["/create/"], "POST")],
+        [(["/", "/create/"], "POST")],
         input_param=restapi.CerberusValidator("_validator_create"),
         output_param=restapi.CerberusValidator("_validator_create_output"),
     )
