@@ -5,9 +5,9 @@
 
 from werkzeug.exceptions import NotFound
 
-from odoo import _, exceptions
 from odoo.osv import expression
 
+from odoo.addons.base_rest import restapi
 from odoo.addons.base_rest.components.service import to_int
 from odoo.addons.component.core import Component
 
@@ -21,35 +21,60 @@ class WishlistService(Component):
     # The following method are 'public' and can be called from the controller.
     # All params are untrusted so please check it !
 
+    @restapi.method(
+        [(["/<int:_id>/get/"], "GET")],
+        input_param=restapi.CerberusValidator("_validator_empty"),
+        output_param=restapi.CerberusValidator("_wishlist_output_schema"),
+    )
     def get(self, _id):
         record = self._get(_id)
         return self._to_json_one(record)
 
+    @restapi.method(
+        [(["/", "/search/"], "GET")],
+        input_param=restapi.CerberusValidator("_validator_search"),
+        output_param=restapi.CerberusValidator("_validator_search_output"),
+    )
     def search(self, **params):
         return self._paginate_search(**params)
 
     # pylint: disable=method-required-super
+    @restapi.method(
+        [(["/create/"], "POST")],
+        input_param=restapi.CerberusValidator("_validator_create"),
+        output_param=restapi.CerberusValidator("_validator_create_output"),
+    )
     def create(self, **params):
-        if not self._is_logged_in():
-            # TODO: is there any way to control this in the REST API?
-            raise exceptions.UserError(
-                _("Must be authenticated to create a wishlist")
-            )
         vals = self._prepare_params(params.copy())
         record = self.env[self._expose_model].create(vals)
         self._post_create(record)
         return {"data": self._to_json_one(record)}
 
+    @restapi.method(
+        [(["/<int:_id>"], "PUT")],
+        input_param=restapi.CerberusValidator("_validator_update"),
+        output_param=restapi.CerberusValidator("_validator_search_output"),
+    )
     def update(self, _id, **params):
         record = self._get(_id)
         record.write(self._prepare_params(params.copy(), mode="update"))
         self._post_update(record)
         return self.search()
 
+    @restapi.method(
+        [(["/<int:_id>"], "DELETE")],
+        input_param=restapi.CerberusValidator("_validator_search"),
+        output_param=restapi.CerberusValidator("_validator_search_output"),
+    )
     def delete(self, _id):
         self._get(_id).unlink()
         return self.search()
 
+    @restapi.method(
+        [(["/<int:_id>/add_to_cart/"], "POST")],
+        input_param=restapi.CerberusValidator("_validator_empty"),
+        output_param=restapi.CerberusValidator("_validator_sale"),
+    )
     def add_to_cart(self, _id):
         record = self._get(_id)
         cart_service = self.component(usage="cart")
@@ -66,21 +91,41 @@ class WishlistService(Component):
         # return new cart
         return cart_service._to_json(cart)
 
+    @restapi.method(
+        [(["/<int:_id>/add_item/"], "POST")],
+        input_param=restapi.CerberusValidator("_validator_add_item"),
+        output_param=restapi.CerberusValidator("_wishlist_output_schema"),
+    )
     def add_item(self, _id, **params):
         record = self._get(_id)
         self._add_item(record, params)
         return self._to_json_one(record)
 
+    @restapi.method(
+        [(["/<int:_id>/update_item/"], "POST")],
+        input_param=restapi.CerberusValidator("_validator_update_item"),
+        output_param=restapi.CerberusValidator("_wishlist_output_schema"),
+    )
     def update_item(self, _id, **params):
         record = self._get(_id)
         self._update_item(record, params)
         return self._to_json_one(record)
 
+    @restapi.method(
+        [(["/<int:_id>/delete_item/"], "POST")],
+        input_param=restapi.CerberusValidator("_validator_delete_item"),
+        output_param=restapi.CerberusValidator("_wishlist_output_schema"),
+    )
     def delete_item(self, _id, **params):
         record = self._get(_id)
         self._delete_item(record, params)
         return self._to_json_one(record)
 
+    @restapi.method(
+        [(["/<int:_id>/move_item/"], "POST")],
+        input_param=restapi.CerberusValidator("_validator_move_item"),
+        output_param=restapi.CerberusValidator("_wishlist_output_schema"),
+    )
     def move_item(self, _id, **params):
         record = self._get(_id)
         self._move_item(record, params)
@@ -92,8 +137,11 @@ class WishlistService(Component):
     def _post_update(self, record):
         pass
 
-    def _validator_get(self):
+    def _validator_empty(self):
         return {}
+
+    def _validator_get(self):
+        return self._validator_empty()
 
     def _validator_search(self):
         return {
@@ -107,27 +155,107 @@ class WishlistService(Component):
             "scope": {"type": "dict", "nullable": True},
         }
 
+    def _validator_search_output(self):
+        return {
+            "size": {"type": "integer", "required": True, "nullable": False},
+            "data": {
+                "type": "list",
+                "schema": {"schema": self._wishlist_output_schema()},
+            },
+        }
+
     def _validator_create(self):
+        return self._wishlist_input_schema()
+
+    def _wishlist_line_input_schema(self):
+        return {
+            "product_id": {"type": "integer", "required": True},
+            "quantity": {"type": "float", "required": True},
+        }
+
+    def _wishlist_line_output_schema(self):
+        # coupled with _json_parser_line
+        return {
+            "id": {"type": "integer", "required": True},
+            "sequence": {"type": "integer", "required": True},
+            "quantity": {"type": "float", "required": True},
+            "product": {
+                "type": "dict",
+                "schema": self._product_output_schema(),
+            },
+        }
+
+    def _partner_input_schema(self):
+        return {
+            "type": "integer",
+            "coerce": to_int,
+            "required": False,
+            "nullable": True,
+        }
+
+    def _partner_output_schema(self):
+        return {
+            "id": {"type": "integer", "required": True},
+            "name": {"type": "string", "required": True},
+        }
+
+    def _product_output_schema(self):
+        # coupled with _json_parser_product
+        return {
+            "id": {"type": "integer", "required": True},
+            "name": {"type": "string", "required": True},
+            "sku": {"type": "string", "required": True},
+            "url_key": {"type": "string", "required": True},
+            "objectID": {"type": "integer", "required": True},
+            "price": {"type": "dict", "required": True},
+        }
+
+    def _wishlist_base_schema(self):
         return {
             "name": {"type": "string", "required": True},
-            "ref": {"type": "string", "required": True, "empty": False},
-            "partner_id": {
-                "type": "integer",
-                "coerce": to_int,
+            "ref": {"type": "string", "required": False, "nullable": True},
+            "typology": {
+                "type": "string",
+                "required": False,
                 "nullable": True,
             },
-            "typology": {"type": "string", "nullable": True},
-            "lines": {
-                "type": "list",
-                "required": False,
-                "schema": {
-                    "type": "dict",
-                    "schema": {
-                        "product_id": {"type": "integer", "required": True},
-                        "quantity": {"type": "float", "required": True},
-                    },
-                },
+        }
+
+    def _wishlist_input_schema(self):
+        res = self._wishlist_base_schema()
+        res["partner_id"] = self._partner_input_schema()
+        res["lines"] = {
+            "type": "list",
+            "required": True,
+            "nullable": False,
+            "schema": {
+                "type": "dict",
+                "schema": self._wishlist_line_input_schema(),
             },
+        }
+        return res
+
+    def _wishlist_output_schema(self):
+        res = self._wishlist_base_schema()
+        res["partner"] = {
+            "type": "dict",
+            "schema": self._partner_output_schema(),
+        }
+        res["lines"] = {
+            "type": "list",
+            "required": True,
+            "nullable": False,
+            "schema": {
+                "type": "dict",
+                "schema": self._wishlist_line_output_schema(),
+            },
+        }
+        res["id"] = {"type": "integer", "required": True, "nullable": False}
+        return res
+
+    def _validator_create_output(self):
+        return {
+            "data": {"type": "dict", "schema": self._wishlist_output_schema()}
         }
 
     def _validator_update(self):
@@ -165,6 +293,26 @@ class WishlistService(Component):
                 "required": True,
                 "type": "integer",
             },
+        }
+
+    def _validator_sale(self):
+        return self._sale_output_schema()
+
+    def _sale_output_schema(self):
+        # coupled with _convert_one_sale
+        # TODO: this should be moved to relevant service
+        return {
+            "id": {"type": "integer"},
+            "state": {"type": "string"},
+            "state_label": {"type": "string"},
+            "name": {"type": "string"},
+            "date": {"type": "string"},
+            "step": {"type": "dict"},
+            "lines": {"type": "dict"},
+            "amount": {"type": "dict"},
+            "shipping": {"type": "dict"},
+            "invoicing": {"type": "dict"},
+            "note": {"type": "string"},
         }
 
     def _validator_delete_item(self):
