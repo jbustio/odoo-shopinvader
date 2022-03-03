@@ -175,15 +175,10 @@ class WishlistService(Component):
 
     def _wishlist_line_output_schema(self):
         # coupled with _json_parser_line
-        return {
-            "id": {"type": "integer", "required": True},
-            "sequence": {"type": "integer", "required": True},
-            "quantity": {"type": "float", "required": True},
-            "product": {
-                "type": "dict",
-                "schema": self._product_output_schema(),
-            },
-        }
+        res = self._wishlist_line_input_schema()
+        res["id"] = {"type": "integer", "required": True}
+        res["sequence"] = {"type": "integer", "required": True}
+        return res
 
     def _partner_input_schema(self):
         return {
@@ -197,17 +192,6 @@ class WishlistService(Component):
         return {
             "id": {"type": "integer", "required": True},
             "name": {"type": "string", "required": True},
-        }
-
-    def _product_output_schema(self):
-        # coupled with _json_parser_product
-        return {
-            "id": {"type": "integer", "required": True},
-            "name": {"type": "string", "required": True},
-            "sku": {"type": "string", "required": True},
-            "url_key": {"type": "string", "required": True},
-            "objectID": {"type": "integer", "required": True},
-            "price": {"type": "dict", "required": True},
         }
 
     def _wishlist_base_schema(self):
@@ -368,7 +352,7 @@ class WishlistService(Component):
             "id",
             "sequence",
             "quantity",
-            ("shopinvader_variant_id:product", self._json_parser_product()),
+            ("shopinvader_variant_id:product_id", lambda s, fn: s[fn].id),
         ]
 
     def _json_parser_product(self):
