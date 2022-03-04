@@ -41,21 +41,22 @@ class MembershipService(Component):
         """
         return self._paginate_search(**params)
 
-    def subscribe(self, _id):
+    def subscribe(self, _id, **params):
         """
         Subscribe to a membership product with logged user
         :param _id: id of product.product
         :return: dict with invoice_id
         """
+        product_id = params.get("membership_product_id") or _id
         if not self._is_logged_in():
             raise UserError(_("A user should be logged"))
         membership_product = self.env["product.product"].search(
-            [("id", "=", _id), ("membership", "=", True)]
+            [("id", "=", product_id), ("membership", "=", True)], limit=1
         )
         if not membership_product:
-            raise UserError(_("No membership product found with id %s") % _id)
+            raise UserError(_("No membership product found with id %s") % product_id)
         wizard = self.env["membership.invoice"].create(
-            {"product_id": _id, "member_price": membership_product.list_price}
+            {"product_id": product_id, "member_price": membership_product.list_price}
         )
         invoices_views_dict = wizard.with_context(
             active_ids=self.partner.ids
@@ -67,7 +68,7 @@ class MembershipService(Component):
         Validator for the subscribe
         :return: dict
         """
-        return {"membership_product_id": {"type": "integer"}}
+        return {"membership_product_id": {"type": "integer", "required": False}}
 
     def _validator_return_subscribe(self):
         """
