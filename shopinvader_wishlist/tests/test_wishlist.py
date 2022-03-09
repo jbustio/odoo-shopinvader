@@ -182,9 +182,8 @@ class WishlistCase(CommonWishlistCase):
             res["partner"], {"id": self.partner.id, "name": self.partner.name}
         )
         prod = self.env.ref("product.product_product_4b")
-        variant = prod.shopinvader_bind_ids[0]
         res_line = res["lines"][0]
         self.assertEqual(res_line["id"], self.prod_set.set_line_ids[0].id)
         self.assertEqual(res_line["quantity"], 1)
         self.assertEqual(res_line["sequence"], 10)
-        self.assertEqual(res_line["product_id"], variant.id)
+        self.assertEqual(res_line["product_id"], prod.id)
