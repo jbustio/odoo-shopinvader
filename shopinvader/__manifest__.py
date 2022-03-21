@@ -27,6 +27,7 @@
         "base_vat",
         "component_event",
         "sale",
+        "sale_cart",
         "sale_discount_display_amount",
         "sale_order_price_recalculation",
         "server_environment",
