@@ -43,7 +43,14 @@ class ShopinvaderRecordListener(Component):
             return
         if "shopinvader_bind_ids" not in record._fields:
             return
-        for binding in record._get_binding_to_export():
+        # TODO: remove when workaround found
+        # https://github.com/odoo/odoo/issues/80133
+        bindings = (
+            record.sudo()
+            ._get_binding_to_export()
+            .filtered(lambda bind: bind.company_id == self.env.company)
+        )
+        for binding in bindings:
             binding.with_delay().export_record(_fields=fields)
 
     def on_record_unlink(self, record, fields=None):
