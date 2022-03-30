@@ -15,7 +15,7 @@ from odoo.addons.base_rest.controllers.main import (
     _PseudoCollection,
 )
 from odoo.addons.base_rest.core import _rest_controllers_per_module
-from odoo.addons.base_rest.tests.common import BaseRestCase
+from odoo.addons.base_rest.tests.common import BaseRestCase, RegistryMixin
 from odoo.addons.component.core import WorkContext
 from odoo.addons.component.tests.common import ComponentMixin
 from odoo.addons.queue_job.job import Job
@@ -162,7 +162,7 @@ class CommonMixin(ComponentMixin, UtilsMixin):
         return _install_lang_odoo(cls.env, lang_xml_id)
 
 
-class CommonCase(SavepointCase, CommonMixin):
+class CommonCase(SavepointCase, CommonMixin, RegistryMixin):
 
     # by default disable tracking suite-wise, it's a time saver :)
     tracking_disable = True
@@ -185,6 +185,7 @@ class CommonCase(SavepointCase, CommonMixin):
         cls._ShopinvaderControllerTest = ControllerTest
         CommonMixin._setup_backend(cls)
         cls.setUpComponent()
+        cls.setUpRegistry()
 
     @classmethod
     def tearDownClass(cls):
