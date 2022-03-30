@@ -1,7 +1,6 @@
 exclude: |
   (?x)
   # NOT INSTALLABLE ADDONS
-  ^shopinvader_delivery_carrier/|
   ^shopinvader_locomotive/|
   ^shopinvader_locomotive_contact_company/|
   ^shopinvader_locomotive_guest_mode/|
