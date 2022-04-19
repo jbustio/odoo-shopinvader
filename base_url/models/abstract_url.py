@@ -190,11 +190,14 @@ class AbstractUrl(models.AbstractModel):
                 else:
                     raise UserError(
                         _(
+                            "Error while updating url for record %s of id %s."
                             "Url_key already exist in other model"
                             "\n- name: %s\n - id: %s\n"
                             "- url_key: %s\n - url_key_id %s"
                         )
                         % (
+                            self.model_id.name,
+                            self.id,
                             existing_url.model_id.name,
                             existing_url.model_id.id,
                             existing_url.url_key,
