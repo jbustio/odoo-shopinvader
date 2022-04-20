@@ -235,7 +235,7 @@ class ShopinvaderBackend(models.Model):
         return result
 
     @api.multi
-    def auto_bind_categories(self):
+    def auto_bind_categories(self, products=None):
         """
         Auto bind product.category for binded shopinvader.product
         :return: bool
@@ -243,13 +243,14 @@ class ShopinvaderBackend(models.Model):
         backends = self.filtered(lambda b: b.category_binding_level > 0)
         if not backends:
             return True
-        all_products = self.env["shopinvader.variant"].search(
-            [
-                ("backend_id", "in", backends.ids),
-                # Force to have only active binding
-                ("active", "=", True),
-            ]
-        )
+        domain = [
+            ("backend_id", "in", backends.ids),
+            # Force to have only active binding
+            ("active", "=", True),
+        ]
+        if products:
+            domain.append(("record_id", "in", products.ids))
+        all_products = self.env["shopinvader.variant"].search(domain)
         for backend in backends:
             shopinv_variants = all_products.filtered(
                 lambda p: p.backend_id == backend
@@ -332,7 +333,7 @@ class ShopinvaderBackend(models.Model):
             self._get_or_create_shopinvader_variants(
                 shopinvader_product, variants
             )
-        self.auto_bind_categories()
+        self.auto_bind_categories(products=variants)
 
     def _get_or_create_shopinvader_products(self, langs, product_tmpl):
         """Get template bindings for given languages or create if missing.
