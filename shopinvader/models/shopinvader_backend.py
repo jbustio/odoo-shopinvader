@@ -254,8 +254,7 @@ class ShopinvaderBackend(models.Model):
             shopinv_variants = all_products.filtered(
                 lambda p: p.backend_id == backend
             )
-            products = shopinv_variants.mapped("record_id")
-            categories = backend._get_related_categories(products)
+            categories = backend._get_related_categories(shopinv_variants)
             if categories:
                 self._bind_all_content(
                     categories._name,
@@ -265,17 +264,20 @@ class ShopinvaderBackend(models.Model):
         return True
 
     @api.multi
-    def _get_related_categories(self, products):
+    def _get_related_categories(self, shopinv_variants):  # non-standard!
         """
         Get product.category to bind (based on current backend and
         given products)
         :param products: product recordset (product or template)
         :return: product.category recordset
         """
+        # break the interface: from the product we would have to get to the bindings,
+        # then filter by backend, which is nonsensical since it was done already
+        # I don't even understand how this did not break product_multi_category
         self.ensure_one()
         # As we consume the first level (direct category), minus 1
         level = self.category_binding_level - 1
-        categories = products.mapped("categ_id")
+        categories = shopinv_variants._get_categories()
         # pull up until the correct level
         parent_categories = categories
         while level > 0:
