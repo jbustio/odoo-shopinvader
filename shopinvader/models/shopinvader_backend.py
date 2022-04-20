@@ -288,8 +288,11 @@ class ShopinvaderBackend(models.Model):
         return categories
 
     @api.multi
-    def bind_all_category(self):
-        self._bind_all_content("product.category", "shopinvader.category", [])
+    def bind_all_category(self, domain=None):
+        domain = domain or []
+        self._bind_all_content(
+            "product.category", "shopinvader.category", domain
+        )
 
     @api.multi
     @job(default_channel="root.shopinvader.bind_products")
