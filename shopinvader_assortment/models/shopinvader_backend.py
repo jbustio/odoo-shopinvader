@@ -20,41 +20,97 @@ class ShopinvaderBackend(models.Model):
     )
 
     @api.multi
-    def _autobind_product_from_assortment(self):
+    def _autobind_product_from_assortment(self, domain_product=None):
         self.ensure_one()
-        product_obj = self.env["product.product"]
-        shopinvader_variant_obj = self.env["shopinvader.variant"]
-        binding_wizard_obj = self.env["shopinvader.variant.binding.wizard"]
-        unbinding_wizard_obj = self.env["shopinvader.variant.unbinding.wizard"]
-        assortment_domain = self.product_assortment_id._get_eval_domain()
-        assortment_products = product_obj.search(assortment_domain)
-        variants_binded = shopinvader_variant_obj.search(
-            [("backend_id", "=", self.id)]
-        )
-        products_binded = variants_binded.mapped("record_id")
-        products_to_bind = assortment_products - products_binded
-        products_to_unbind = products_binded - assortment_products
-        variants_to_unbind = variants_binded.filtered(
-            lambda x: x.record_id.id in products_to_unbind.ids
-        )
+        domain = self.product_assortment_id._get_eval_domain()
+        self._bind_products_from_assortment(domain, domain_product)
+        self._unbind_products_from_assortment(domain, domain_product)
 
-        if products_to_bind:
-            binding_wizard = binding_wizard_obj.create(
-                {
-                    "backend_id": self.id,
-                    "product_ids": [(6, 0, products_to_bind.ids)],
-                }
-            )
-            binding_wizard.bind_products()
+    def _fast_get_product_ids(self, domain, where_extend, where_args):
+        e = expression.expression(domain, self.env["product.product"])
+        where_domain, where_params = e.to_sql()
+        where_clause = " AND ".join((where_domain, where_extend))
+        query = """
+            SELECT product_product.id
+            FROM product_product, product_template as product_product__product_tmpl_id
+            WHERE %s"""
+        query = query % where_clause
+        # pylint: disable=sql-injection  # YOLO
+        self.env.cr.execute(query, tuple(where_params + where_args))
+        return [x[0] for x in self.env.cr.fetchall()]
 
-        if variants_to_unbind:
-            unbinding_wizard = unbinding_wizard_obj.create(
-                {"shopinvader_variant_ids": [(6, 0, variants_to_unbind.ids)]}
-            )
-            unbinding_wizard.unbind_products()
+    def _bind_products_from_assortment(self, domain, domain_product=None):
+        """Private method, call from _autobind_product_from_assortment."""
+        # we do in SQL the equivalent of making:
+        # domain_unbound = [("shopinvader_bind_ids", "=", False),
+        # ("shopinvader_bind_ids.backend_id", "=", self.id)]
+        # domain_to_bind = expression.AND((domain, domain_unbound))
+        # to_bind_ids = self.env["product.product"].search(domain_to_bind).ids
+        # because the ORM makes a horrible query whereas this should run often
+        domain = (
+            expression.AND((domain, domain_product))
+            if domain_product
+            else domain
+        )
+        where_unbound = """
+        NOT EXISTS (
+            SELECT shopinvader_variant.id
+            FROM shopinvader_variant, shopinvader_product
+            WHERE product_product.id = shopinvader_variant.record_id
+                AND shopinvader_variant.shopinvader_product_id = shopinvader_product.id
+                AND shopinvader_product.backend_id = %s
+        )"""
+        e = expression.expression(domain, self.env["product.product"])
+        where_domain, where_params = e.to_sql()
+        where_clause = " AND ".join((where_domain, where_unbound))
+        query = """
+            SELECT product_product.id
+            FROM product_product,
+                 product_template as product_product__product_tmpl_id
+            WHERE %s"""
+        query = query % where_clause
+        # pylint: disable=sql-injection
+        self.env.cr.execute(query, tuple(where_params + [self.id]))
+        to_bind_ids = [x[0] for x in self.env.cr.fetchall()]
+
+        if to_bind_ids:
+            product_command = [(6, 0, to_bind_ids)]
+            vals = {"backend_id": self.id, "product_ids": product_command}
+            wizard_model = self.env["shopinvader.variant.binding.wizard"]
+            wizard_model.create(vals).bind_products()
+
+    def _unbind_products_from_assortment(self, domain, domain_product=None):
+        """Private method, call from _autobind_product_from_assortment."""
+        domain = ["!"] + expression.normalize_domain(domain)
+        domain = (
+            expression.AND((domain, domain_product))
+            if domain_product
+            else domain
+        )
+        e = expression.expression(domain, self.env["product.product"])
+        where_domain, where_params = e.to_sql()
+        query = """
+SELECT shopinvader_variant.id
+FROM (shopinvader_variant
+INNER JOIN shopinvader_product
+    ON shopinvader_variant.shopinvader_product_id = shopinvader_product.id)
+WHERE shopinvader_variant.record_id IN (
+    SELECT product_product.id
+    FROM product_product, product_template as product_product__product_tmpl_id
+    WHERE %s
+)"""
+        query = query % where_domain
+        query += " AND shopinvader_product.backend_id = %s"
+        # pylint: disable=sql-injection
+        self.env.cr.execute(query, tuple(where_params + [self.id]))
+        to_unbind_ids = [x[0] for x in self.env.cr.fetchall()]
+        if to_unbind_ids:
+            vals = {"shopinvader_variant_ids": [(6, 0, to_unbind_ids)]}
+            wizard_model = self.env["shopinvader.variant.unbinding.wizard"]
+            wizard_model.create(vals).unbind_products()
 
     @api.model
-    def autobind_product_from_assortment(self, domain=None):
+    def autobind_product_from_assortment(self, domain=None, **kwargs):
         if domain is None:
             domain = []
 
@@ -63,7 +119,7 @@ class ShopinvaderBackend(models.Model):
         )
 
         for backend in self.search(domain):
-            backend._autobind_product_from_assortment()
+            backend._autobind_product_from_assortment(**kwargs)
 
     @api.multi
     def force_recompute_all_binding_index(self):
