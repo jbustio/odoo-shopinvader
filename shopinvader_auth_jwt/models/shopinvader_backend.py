@@ -18,12 +18,21 @@ class ShopinvaderBackend(models.Model):
     )
 
     @api.model
+    def _get_jwt_aud_domain(self, aud_list):
+        return [("jwt_aud", "in", aud_list)]
+
+    @api.model
+    def _get_jwt_aud_from_domain(self, domain, aud_list):
+        return self.search(domain)
+
+    @api.model
     def _get_from_jwt_aud(self, aud):
         if not aud:
             return self.browse([])
         if isinstance(aud, str):
             aud = [aud]
-        backends = self.search([("jwt_aud", "in", aud)])
+        domain = self.get_aud_domain(aud)
+        backends = self._get_jwt_aud_from_domain(domain, aud)
         if len(backends) != 1:
             _logger.warning(
                 "%d backends found for JWT aud %r", len(backends), aud
