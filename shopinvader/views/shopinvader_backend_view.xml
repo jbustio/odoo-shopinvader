@@ -159,6 +159,7 @@
                                             name="template_id"
                                             domain="[('model_id', '=', model_id)]"
                                         />
+                                        <field name="queue_job_priority" />
                                     </tree>
                                 </field>
                             </group>
