@@ -90,6 +90,10 @@ class ShopinvaderPartner(models.Model):
             )
         if not vals.get("record_id"):
             vals["record_id"] = self._get_or_create_partner(vals).id
+        # The new partner should be marked as customer
+        # Exactly when a partner is created from Sale menu
+        # The partner is marked as customer via the action's context
+        vals.update({"customer_rank": 1})
         return vals
 
     @api.model
