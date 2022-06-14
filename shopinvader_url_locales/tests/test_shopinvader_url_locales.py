@@ -9,8 +9,12 @@ class TestShopinvaderUrlocales(CommonCase):
     @classmethod
     def setUpClass(cls):
         super(TestShopinvaderUrlocales, cls).setUpClass()
-        cls.product_exporter = cls.env.ref("shopinvader.ir_exp_shopinvader_variant")
-        cls.category_exporter = cls.env.ref("shopinvader.ir_exp_shopinvader_category")
+        cls.product_exporter = cls.env.ref(
+            "shopinvader.ir_exp_shopinvader_variant"
+        )
+        cls.category_exporter = cls.env.ref(
+            "shopinvader.ir_exp_shopinvader_category"
+        )
         lang = cls._install_lang("base.lang_fr")
         cls.backend.lang_ids |= lang
         cls.backend.bind_all_category()

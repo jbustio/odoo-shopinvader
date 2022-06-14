@@ -9,7 +9,7 @@
     "version": "10.0.1.0.0",
     "license": "AGPL-3",
     "author": "ACSONE SA/NV",
-    "website": "https://acsone.eu/",
+    "website": "https://github.com/shopinvader/odoo-shopinvader",
     "depends": ["shopinvader"],
     "data": ["data/ir_export_category.xml", "data/ir_export_product.xml"],
     "demo": [],

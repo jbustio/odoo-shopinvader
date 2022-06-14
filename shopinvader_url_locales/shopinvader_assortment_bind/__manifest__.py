@@ -11,7 +11,10 @@
     "website": "https://acsone.eu/",
     "depends": ["shopinvader_assortment"],
     "application": False,
-    "data": ["data/action_product_template.xml", "data/action_product_product.xml"],
+    "data": [
+        "data/action_product_template.xml",
+        "data/action_product_product.xml",
+    ],
     "demo": [],
     "installable": True,
 }

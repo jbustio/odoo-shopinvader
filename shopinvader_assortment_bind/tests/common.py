@@ -10,16 +10,24 @@ class TestProductExport(SavepointComponentCase):
     def setUpClass(cls):
         super(TestProductExport, cls).setUpClass()
 
-        new_context = dict(tracking_disable=True, bind_products_immediately=True)
+        new_context = dict(
+            tracking_disable=True, bind_products_immediately=True
+        )
         cls.env = cls.env(context=dict(cls.env.context, **new_context))
 
-        cls.product_template_in = cls.env["product.template"].create({"name": "P"})
+        cls.product_template_in = cls.env["product.template"].create(
+            {"name": "P"}
+        )
         cls.product_in = cls.product_template_in.product_variant_id
 
-        cls.product_template_out = cls.env["product.template"].create({"name": "N"})
+        cls.product_template_out = cls.env["product.template"].create(
+            {"name": "N"}
+        )
         cls.product_out = cls.product_template_out.product_variant_id
 
-        cls.product_templates = cls.product_template_in + cls.product_template_out
+        cls.product_templates = (
+            cls.product_template_in + cls.product_template_out
+        )
         cls.products = cls.product_in + cls.product_out
 
         cls.backend = cls.env.ref("shopinvader.backend_1")

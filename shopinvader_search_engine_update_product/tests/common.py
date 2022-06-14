@@ -11,11 +11,15 @@ class TestProductUpdate(SavepointComponentCase):
     @classmethod
     def setUpClass(cls):
         super(TestProductUpdate, cls).setUpClass()
-        cls.product_template = cls.env["product.template"].create({"name": "P"})
+        cls.product_template = cls.env["product.template"].create(
+            {"name": "P"}
+        )
         cls.product = cls.product_template.product_variant_id
 
         cls.backend = cls.env.ref("shopinvader.backend_1")
-        cls.backend.bind_all_product(domain=[("id", "=", cls.product_template.id)])
+        cls.backend.bind_all_product(
+            domain=[("id", "=", cls.product_template.id)]
+        )
 
         cls.binding = cls.product.shopinvader_bind_ids
         cls.binding.to_update = False

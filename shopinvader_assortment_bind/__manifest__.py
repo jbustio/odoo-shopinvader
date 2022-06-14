@@ -8,10 +8,13 @@
     "version": "10.0.1.0.0",
     "license": "AGPL-3",
     "author": "ACSONE SA/NV",
-    "website": "https://acsone.eu/",
+    "website": "https://github.com/shopinvader/odoo-shopinvader",
     "depends": ["shopinvader_assortment"],
     "application": False,
-    "data": ["data/action_product_template.xml", "data/action_product_product.xml"],
+    "data": [
+        "data/action_product_template.xml",
+        "data/action_product_product.xml",
+    ],
     "demo": [],
     "installable": True,
 }

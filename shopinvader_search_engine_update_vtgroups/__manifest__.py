@@ -8,8 +8,11 @@
     "version": "10.0.1.0.0",
     "license": "AGPL-3",
     "author": "ACSONE SA/NV",
-    "website": "https://acsone.eu/",
-    "depends": ["shopinvader_search_engine_update_product", "alc_partner_veterinary"],
+    "website": "https://github.com/shopinvader/odoo-shopinvader",
+    "depends": [
+        "shopinvader_search_engine_update_product",
+        "alc_partner_veterinary",
+    ],
     "application": False,
     "data": [],
     "demo": [],

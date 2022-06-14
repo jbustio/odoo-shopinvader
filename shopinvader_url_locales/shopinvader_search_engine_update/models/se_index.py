@@ -16,7 +16,9 @@ class SeIndex(models.Model):
         return domain + [("to_update", "=", "true")] if continuous else domain
 
     @api.model
-    def cron_recompute_all_continuous(self, force_export=False, batch_size=500):
+    def cron_recompute_all_continuous(
+        self, force_export=False, batch_size=500
+    ):
         self.search([])._cron_recompute_all(
             continuous=True, force_export=force_export, batch_size=batch_size
         )
@@ -28,7 +30,9 @@ class SeIndex(models.Model):
         )
 
     @api.model
-    def _cron_recompute_all(self, continuous, force_export=False, batch_size=500):
+    def _cron_recompute_all(
+        self, continuous, force_export=False, batch_size=500
+    ):
         # recompute_all_binding should be refactored to accept a configurable domain...
         filter_continuous = lambda m: m.continuous_update == continuous
         target_models = self.mapped("model_id").filtered(filter_continuous)
@@ -37,10 +41,12 @@ class SeIndex(models.Model):
             domain = indexes._get_model_domain(continuous)
             bindings = self.env[target_model.model].search(domain)
             for batch in bindings.batch(batch_size):
-                description = _("Recompute json for %s record(s).") % len(batch)
-                batch.with_delay(description=description)._jobify_recompute_json(
-                    force_export=force_export
+                description = _("Recompute json for %s record(s).") % len(
+                    batch
                 )
+                batch.with_delay(
+                    description=description
+                )._jobify_recompute_json(force_export=force_export)
                 if continuous:
                     batch.write({"to_update": "scheduled"})
 

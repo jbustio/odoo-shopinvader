@@ -13,6 +13,8 @@ class ProductProduct(models.Model):
 
     @job(default_channel="root.background.process")
     def shopinvader_manual_export(self):
-        bindings = self.with_context(active_test=False).mapped("shopinvader_bind_ids")
+        bindings = self.with_context(active_test=False).mapped(
+            "shopinvader_bind_ids"
+        )
         bindings.recompute_json()
         bindings.synchronize()
