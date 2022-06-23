@@ -137,6 +137,7 @@ class CartService(Component):
                 "nullable": True,
             },
             "amount": {"type": "dict", "schema": self._amount_output_schema},
+            "discount": {"type": "dict", "schema": self._discount_schema},
             "delivery": {
                 "type": "dict",
                 "schema": self._delivery_output_schema,
@@ -184,11 +185,13 @@ class CartService(Component):
                 "nullable": True,
             },
             "name": {"type": "string", "required": True, "nullable": False},
-            "amount": {
-                "type": "dict",
-                "schema": self._amount_with_price_output_schema,
-            },
+            "amount": {"type": "dict", "schema": self._amount_output_schema},
             "qty": {"type": "float", "required": True, "nullable": False},
+            "discount": {
+                "type": "dict",
+                "schema": self._line_discount_schema,
+            },
+            "unit_price": {"type": "dict", "schema": self._unit_price_schema},
         }
 
     @property
@@ -197,11 +200,6 @@ class CartService(Component):
             "tax": {"type": "float", "required": True, "nullable": False},
             "untaxed": {"type": "float", "required": True, "nullable": False},
             "total": {"type": "float", "required": True, "nullable": False},
-            "discount_total": {
-                "type": "float",
-                "required": True,
-                "nullable": False,
-            },
             "total_without_discount": {
                 "type": "float",
                 "required": True,
@@ -210,14 +208,28 @@ class CartService(Component):
         }
 
     @property
-    def _amount_with_price_output_schema(self):
-        amount_schema = self._amount_output_schema
-        amount_schema["price"] = {
-            "type": "float",
-            "required": True,
-            "nullable": False,
+    def _discount_schema(self):
+        return {
+            "value": {"type": "float", "required": True, "nullable": False}
         }
-        return amount_schema
+
+    @property
+    def _line_discount_schema(self):
+        return {
+            "rate": {"type": "float", "required": True, "nullable": False},
+            "value": {"type": "float", "required": True, "nullable": False},
+        }
+
+    @property
+    def _unit_price_schema(self):
+        return {
+            "untaxed": {"type": "float", "required": True, "nullable": False},
+            "untaxed_with_discount": {
+                "type": "float",
+                "required": True,
+                "nullable": False,
+            },
+        }
 
     # ##############
     # implementation
@@ -304,6 +316,7 @@ class CartService(Component):
             "delivery": self._convert_delivery(sale),
             "invoicing": self._convert_invoicing(sale),
             "note": sale.note or None,
+            "discount": self._convert_discount(sale),
         }
 
     def _convert_one_line(self, line):
@@ -312,16 +325,25 @@ class CartService(Component):
             "product_id": line.product_id.id,
             "name": line.name or None,
             "amount": {
-                "price": line.price_unit,
                 "untaxed": line.price_subtotal,
                 "tax": line.price_tax,
                 "total": line.price_total,
-                "discount_total": line.discount_total,
                 "total_without_discount": line.price_total_no_discount,
             },
+            "unit_price": self._convert_one_line_unit_price(line),
             "qty": line.product_uom_qty,
-            "discount": {"rate": line.discount, "value": line.discount_total},
+            "discount": self._convert_one_line_discount(line),
         }
+
+    def _convert_one_line_unit_price(self, line):
+        return {
+            "untaxed": line.price_unit,
+            "untaxed_with_discount": line.price_unit
+            - line.price_unit * (line.discount or 0) / 100,
+        }
+
+    def _convert_one_line_discount(self, line):
+        return {"rate": line.discount, "value": line.discount_total}
 
     def _convert_lines(self, sale):
         lines = []
@@ -352,10 +374,15 @@ class CartService(Component):
             "tax": float_round(sale.amount_tax, precision),
             "untaxed": float_round(sale.amount_untaxed, precision),
             "total": float_round(sale.amount_total, precision),
-            "discount_total": float_round(sale.discount_total, precision),
             "total_without_discount": float_round(
                 sale.price_total_no_discount, precision
             ),
+        }
+
+    def _convert_discount(self, sale):
+        precision = sale.currency_id.decimal_places
+        return {
+            "value": float_round(sale.discount_total, precision),
         }
 
     def _is_line(self, line):
