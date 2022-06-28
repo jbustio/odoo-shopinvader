@@ -36,7 +36,6 @@ class CommonValidationToken(CommonCase):
             shopinvader_session=self.shopinvader_session,
         ) as work:
             self.service = work.component(usage=self._get_usage())
-        self.shopinvader_config = self.env["shopinvader.config.settings"]
         self.token_model = self.env.ref(
             "shopinvader_validation_token.model_shopinvader_security_token"
         )
