@@ -67,11 +67,29 @@ class ShopinvaderBackend(models.Model):
             SELECT product_product.id
             FROM product_product,
                  product_template as product_product__product_tmpl_id
-            WHERE %s"""
-        query = query % where_clause
+            WHERE product_product.active = true AND %s"""
+        query_unbound = query % where_clause
         # pylint: disable=sql-injection
-        self.env.cr.execute(query, tuple(where_params + [self.id]))
+        self.env.cr.execute(query_unbound, tuple(where_params + [self.id]))
         to_bind_ids = [x[0] for x in self.env.cr.fetchall()]
+
+        where_archived = """
+                 EXISTS (
+                    SELECT shopinvader_variant.id
+                    FROM shopinvader_variant, shopinvader_product
+                    WHERE product_product.id = shopinvader_variant.record_id
+                        AND shopinvader_variant.shopinvader_product_id = shopinvader_product.id
+                        AND shopinvader_product.backend_id = %s
+                        AND shopinvader_variant.active = false
+                )"""
+        where_rebind = " AND ".join((where_domain, where_archived))
+        query_rebind = query % where_rebind
+        # pylint: disable=sql-injection
+        self.env.cr.execute(query_rebind, tuple(where_params + [self.id]))
+        to_rebind_ids = [x[0] for x in self.env.cr.fetchall()]
+        if to_rebind_ids:
+            to_rebind = self.env["product.product"].browse(to_rebind_ids)
+            to_rebind.mapped("shopinvader_bind_ids").write({"active": True})
 
         if to_bind_ids:
             product_command = [(6, 0, to_bind_ids)]
