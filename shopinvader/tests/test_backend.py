@@ -176,3 +176,45 @@ class BackendCase(CommonCase):
             "new_key"
         )
         self.assertEqual(self.backend, backend)
+
+    def test_variant_exporter_with_shop_request(self):
+        exporter = self.env["ir.exports"].create(
+            {
+                "name": "Specific variant export 1",
+                "resource": "shopinvader.variant",
+                "export_fields": [
+                    (0, False, {"name": "id"}),
+                    (0, False, {"name": "name"}),
+                ],
+            }
+        )
+        self.backend.write({"variant_exporter_id": exporter.id})
+        variant = (
+            self.env["shopinvader.variant"]
+            .with_context(shopinvader_request=1)
+            .search([], limit=1)
+        )
+        data = variant.get_shop_data()
+        expected_data = variant.jsonify(exporter.get_json_parser(), one=True)
+        self.assertEqual(expected_data, data)
+
+    def test_variant_exporter_without_shop_request(self):
+        exporter = self.env["ir.exports"].create(
+            {
+                "name": "Specific variant export 2",
+                "resource": "shopinvader.variant",
+                "export_fields": [
+                    (0, False, {"name": "id"}),
+                    (0, False, {"name": "name"}),
+                ],
+            }
+        )
+        self.backend.write({"variant_exporter_id": exporter.id})
+        variant = (
+            self.env["shopinvader.variant"]
+            .with_context(shopinvader_request=0)
+            .search([], limit=1)
+        )
+        data = variant.get_shop_data()
+        expected_data = variant._get_shop_data()
+        self.assertEqual(expected_data, data)
