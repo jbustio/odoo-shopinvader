@@ -105,3 +105,11 @@ class PartnerEventListener(Component):
         if not self._check_partner(record, warn=False):
             return
         self._bind_customers(record)
+
+    @skip_if(
+        lambda self, record, **kwargs: self._get_skip_if_condition(record, **kwargs)
+    )
+    def on_increase_rank(self, record):
+        if not self._check_partner(record, warn=False):
+            return
+        self._bind_customers(record)
