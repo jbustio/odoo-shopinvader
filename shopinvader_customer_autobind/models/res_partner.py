@@ -9,6 +9,7 @@ class ResPartner(models.Model):
 
     def _increase_rank(self, field, n=1):
         res = super()._increase_rank(field, n=n)
-        if self.ids and field == "customer_rank":
-            self._event("on_increase_rank").notify(self)
+        for partner in self:
+            if partner.ids and field == "customer_rank":
+                partner._event("on_increase_rank").notify(partner)
         return res
