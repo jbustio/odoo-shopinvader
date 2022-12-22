@@ -237,6 +237,12 @@ class ShopinvaderBackend(models.Model):
         "That cost a lot in Database-read/network/json-cast time.",
         domain=[("resource", "=", "shopinvader.variant")],
     )
+
+    product_ids = fields.One2many(
+        comodel_name="shopinvader.variant",
+        inverse_name="backend_id",
+        string="Product ids",
+    )
     _sql_constraints = [
         (
             "unique_website_unique_key",
