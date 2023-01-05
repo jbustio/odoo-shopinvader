@@ -241,7 +241,7 @@ class ShopinvaderBackend(models.Model):
     product_ids = fields.One2many(
         comodel_name="shopinvader.variant",
         inverse_name="backend_id",
-        string="Product ids",
+        string="Products",
     )
     _sql_constraints = [
         (
