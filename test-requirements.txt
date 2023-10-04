@@ -8,4 +8,11 @@ vcrpy-unittest
 unittest2 # For shopinvader test_controller, which inherits component
 odoo-test-helper
 httpx  # For FastAPI tests
-odoo-addon-extendable-fastapi @ git+https://github.com/OCA/rest-framework@refs/pull/364/head#subdirectory=setup/extendable_fastapi
+odoo-addon-shopinvader-product @ git+https://github.com/shopinvader/odoo-shopinvader.git@refs/pull/1390/head#subdirectory=setup/shopinvader_product
+odoo-addon-shopinvader-product-seo @ git+https://github.com/shopinvader/odoo-shopinvader.git@refs/pull/1390/head#subdirectory=setup/shopinvader_product_seo
+odoo-addon-shopinvader-product-description @ git+https://github.com/shopinvader/odoo-shopinvader.git@refs/pull/1390/head#subdirectory=setup/shopinvader_product_description
+odoo-addon-shopinvader-product-brand @ git+https://github.com/shopinvader/odoo-shopinvader.git@refs/pull/1408/head#subdirectory=setup/shopinvader_product_brand
+odoo-addon-shopinvader-base-url @ git+https://github.com/shopinvader/odoo-shopinvader.git@refs/pull/1399/head#subdirectory=setup/shopinvader_base_url
+odoo-addon-shopinvader-search-engine @ git+https://github.com/shopinvader/odoo-shopinvader.git@refs/pull/1390/head#subdirectory=setup/shopinvader_search_engine
+odoo-addon-shopinvader-search-engine-image @ git+https://github.com/shopinvader/odoo-shopinvader.git@refs/pull/1413/head#subdirectory=setup/shopinvader_search_engine_image
+odoo-addon-shopinvader-search-engine-product-brand @ git+https://github.com/shopinvader/odoo-shopinvader.git@refs/pull/1408/head#subdirectory=setup/shopinvader_search_engine_product_brand
