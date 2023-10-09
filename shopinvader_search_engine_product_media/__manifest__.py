@@ -3,7 +3,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
 {
-    "name": "Shopinvader Product Media",
+    "name": "Shopinvader Search Engine Product Media",
     "summary": "Index storage media data into search engine",
     "version": "16.0.1.0.0",
     "category": "Shopinvader",
