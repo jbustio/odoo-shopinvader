@@ -5,6 +5,10 @@
 
 from odoo import _, api, fields, models
 from odoo.exceptions import ValidationError
+from odoo.osv.expression import NEGATIVE_TERM_OPERATORS
+from odoo.tools.misc import str2bool
+
+from .shopinvader_partner import STATE_ACTIVE, STATE_PENDING
 
 
 class ResPartner(models.Model):
@@ -21,7 +25,9 @@ class ResPartner(models.Model):
     )
     # In europe we use more the opt_in
     opt_in = fields.Boolean(
-        compute="_compute_opt_in", inverse="_inverse_opt_in"
+        compute="_compute_opt_in",
+        inverse="_inverse_opt_in",
+        search="_search_opt_in",
     )
     shopinvader_enabled = fields.Boolean(
         string="Shop enabled",
@@ -78,6 +84,11 @@ class ResPartner(models.Model):
                 blacklist_model._remove(record.email)
             else:
                 blacklist_model._add(record.email)
+
+    @api.model
+    def _search_opt_in(self, operator, value):
+        domain = [("is_blacklisted", operator, not value)]
+        return domain
 
     @api.depends("parent_id")
     def _compute_address_type(self):
