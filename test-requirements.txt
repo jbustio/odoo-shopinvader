@@ -8,3 +8,7 @@ vcrpy-unittest
 unittest2 # For shopinvader test_controller, which inherits component
 odoo-test-helper
 httpx  # For FastAPI tests
+
+# OCA/odoo-pim
+odoo-addon-attribute-set @ git+https://github.com/OCA/odoo-pim.git@refs/pull/171/head#subdirectory=setup/attribute_set
+odoo-addon-product-attribute-set @ git+https://github.com/OCA/odoo-pim.git@refs/pull/142/head#subdirectory=setup/product_attribute_set
