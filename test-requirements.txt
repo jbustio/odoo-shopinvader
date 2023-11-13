@@ -10,3 +10,4 @@ odoo-test-helper
 httpx  # For FastAPI tests
 odoo-addon-product-stock-state @ git+https://github.com/OCA/product-attribute@refs/pull/1339/head#subdirectory=setup/product_stock_state
 odoo-addon-fastapi @ git+https://github.com/OCA/rest-framework@refs/pull/382/head#subdirectory=setup/fastapi
+odoo-addon-sale-loyalty-order-info @ git+https://github.com/OCA/sale-promotion.git@refs/pull/177/head#subdirectory=setup/sale_loyalty_order_info
