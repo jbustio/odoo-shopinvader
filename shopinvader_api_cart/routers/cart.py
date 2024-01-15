@@ -24,6 +24,7 @@ cart_router = APIRouter(tags=["carts"])
 
 
 @cart_router.get("/")
+@cart_router.get("/current")
 @cart_router.get("/{uuid}")
 def get(
     env: Annotated[api.Environment, Depends(authenticated_partner_env)],
@@ -38,6 +39,7 @@ def get(
 
 
 @cart_router.post("/sync", status_code=201)
+@cart_router.post("/sync/current", status_code=201)
 @cart_router.post("/sync/{uuid}", status_code=201)
 def sync(
     data: CartSyncInput,
@@ -53,6 +55,7 @@ def sync(
 
 
 @cart_router.post("/update")
+@cart_router.post("/update/current")
 @cart_router.post("/update/{uuid}")
 def update(
     data: CartUpdateInput,
