@@ -29,24 +29,24 @@ def init(
     This route is authenticated, so we can verify the cart
     is accessible by the authenticated partner.
     """
-    cart_sudo = env["sale.order"]._find_open_cart(partner.id, uuid)
-    if not cart_sudo:
+    cart = env["sale.order"]._find_open_cart(partner.id, uuid)
+    if not cart:
         return None
 
-    sale_order_sudo = env["sale.order"].sudo().browse(cart_sudo.id)
+    sale_order = env["sale.order"].sudo().browse(cart.id)
     payment_data = {
         "payable": Payable(
-            payable_id=cart_sudo.id,
+            payable_id=cart.id,
             payable_model="sale.order",
-            payable_reference=sale_order_sudo.name,
-            amount=sale_order_sudo.amount_total,
-            currency_id=sale_order_sudo.currency_id.id,
-            partner_id=sale_order_sudo.partner_id.id,
-            company_id=sale_order_sudo.company_id.id,
+            payable_reference=sale_order.name,
+            amount=sale_order.amount_total,
+            currency_id=sale_order.currency_id.id,
+            partner_id=sale_order.partner_id.id,
+            company_id=sale_order.company_id.id,
         ).model_dump_json(),
-        "payable_reference": sale_order_sudo.name,
-        "amount": sale_order_sudo.amount_total,
-        "currency_code": sale_order_sudo.currency_id.name,
+        "payable_reference": sale_order.name,
+        "amount": sale_order.amount_total,
+        "currency_code": sale_order.currency_id.name,
     }
     payment_data["access_token"] = payment_utils.generate_access_token(
         payment_data["payable"]
