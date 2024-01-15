@@ -24,6 +24,7 @@ cart_router = APIRouter(tags=["carts"])
 
 
 @cart_router.get("/")
+@cart_router.get("/current")
 @cart_router.get("/{uuid}")
 def get(
     env: Annotated[api.Environment, Depends(authenticated_partner_env)],

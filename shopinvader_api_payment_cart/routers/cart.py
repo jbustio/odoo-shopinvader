@@ -18,7 +18,8 @@ from odoo.addons.shopinvader_api_payment.routers.utils import Payable
 from odoo.addons.shopinvader_api_payment.schemas import PaymentData
 
 
-@cart_router.get("/payable")
+@cart_router.get("/current/payable")
+@cart_router.get("/{uuid}/payable")
 def init(
     env: Annotated[api.Environment, Depends(authenticated_partner_env)],
     partner: Annotated["ResPartner", Depends(authenticated_partner)],
