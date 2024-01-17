@@ -25,6 +25,7 @@ cart_router = APIRouter(tags=["carts"])
 
 
 @cart_router.get("/")
+@cart_router.get("/current")
 @cart_router.get("/{uuid}")
 def get(
     env: Annotated[api.Environment, Depends(authenticated_partner_env)],
@@ -39,6 +40,7 @@ def get(
 
 
 @cart_router.post("/sync", status_code=201)
+@cart_router.post("/current/sync", status_code=201)
 @cart_router.post("/{uuid}/sync", status_code=201)
 @cart_router.post("/sync/{uuid}", status_code=201, deprecated=True)
 def sync(
@@ -55,6 +57,7 @@ def sync(
 
 
 @cart_router.post("/update")
+@cart_router.post("/current/update")
 @cart_router.post("/{uuid}/update")
 @cart_router.post("/update/{uuid}", deprecated=True)
 def update(
