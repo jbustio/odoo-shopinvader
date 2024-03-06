@@ -39,7 +39,7 @@ def custom_payment_pending_msg(
 class ShopinvaderApiPaymentRouterHelper(models.AbstractModel):
     _inherit = "shopinvader_api_payment.payment_router.helper"
 
-    def _get_custom_redirect_form_html(
+    def _get_payment_info_form_html(
         self, tx_sudo: PaymentTransaction, payable: str
     ) -> str:
         shopinvader_api_payment_base_url = tx_sudo.env.context.get(
@@ -64,7 +64,7 @@ class ShopinvaderApiPaymentRouterHelper(models.AbstractModel):
     ) -> TransactionProcessingValues:
         tx_processing_values = super()._get_tx_processing_values(tx_sudo, **kwargs)
         if tx_sudo.provider_id.code == "custom":
-            tx_processing_values.redirect_form_html = (
-                self._get_custom_redirect_form_html(tx_sudo, kwargs.get("payable", ""))
+            tx_processing_values.payment_info_form_html = (
+                self._get_payment_info_form_html(tx_sudo, kwargs.get("payable", ""))
             )
         return tx_processing_values
