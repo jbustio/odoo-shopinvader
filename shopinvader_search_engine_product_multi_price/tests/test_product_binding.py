@@ -22,34 +22,16 @@ class TestProductBinding(TestBindingIndexBase):
     def test_binding_prices_no_pricelist(self):
         self.product_binding.recompute_json()
         data = self.product_binding.data
-        self.assertEqual(len(data["prices"]), 1)
-        self.assertEqual(
-            data["prices"]["default"],
-            {
-                "value": 750.0,
-                "tax_included": False,
-                "discount": 0.0,
-                "original_value": 750.0,
-            },
-        )
+        self.assertEqual(len(data["price_by_pricelist"]), 0)
 
-    def test_binding_prices_pricelist(self):
+    def test_binding_price_by_pricelist(self):
         pricelist = self.env.ref("product_get_price_helper.pricelist_1")
         self.index.backend_id.pricelist_ids = [(6, 0, pricelist.ids)]
         self.product_binding.recompute_json()
         data = self.product_binding.data
-        self.assertEqual(len(data["prices"]), 2)
+        self.assertEqual(len(data["price_by_pricelist"]), 1)
         self.assertEqual(
-            data["prices"]["default"],
-            {
-                "value": 750.0,
-                "tax_included": False,
-                "discount": 0.0,
-                "original_value": 750.0,
-            },
-        )
-        self.assertEqual(
-            data["prices"][f"{pricelist.id}"],
+            data["price_by_pricelist"][str(pricelist.id)],
             {
                 "value": 600.0,
                 "tax_included": False,

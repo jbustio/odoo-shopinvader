@@ -14,10 +14,10 @@ class ProductPriceInfo(StrictExtendableBaseModel):
 
 
 class ProductProduct(BaseProduct, extends=True):
-    prices: dict[str, ProductPriceInfo] = {}
+    price_by_pricelist: dict[str, ProductPriceInfo] = {}
 
     @classmethod
     def from_product_product(cls, odoo_rec):
         obj = super().from_product_product(odoo_rec)
-        obj.prices = odoo_rec.shopinvader_prices or {}
+        obj.price_by_pricelist = odoo_rec.shopinvader_price_by_pricelist or {}
         return obj
