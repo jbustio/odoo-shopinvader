@@ -29,6 +29,8 @@
         "connector_elasticsearch",
         "shopinvader_restapi",
         "shopinvader_restapi_auth_jwt",
+        "sale_channel_search_engine_category",
+        "sale_channel_search_engine_product",
     ],
     "external_dependencies": {"python": ["fastapi"]},
     "data": [
