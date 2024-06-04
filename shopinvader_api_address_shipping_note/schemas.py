@@ -2,13 +2,13 @@
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
 from odoo.addons.shopinvader_api_address.schemas import (
-    ShippingAddressCreate,
-    ShippingAddressUpdate,
+    DeliveryAddressCreate,
+    DeliveryAddressUpdate,
 )
-from odoo.addons.shopinvader_schema_address.schemas import ShippingAddress
+from odoo.addons.shopinvader_schema_address.schemas import DeliveryAddress
 
 
-class ShippingAddress(ShippingAddress, extends=ShippingAddress):
+class ShippingAddressNote(DeliveryAddress, extends=DeliveryAddress):
     """
     Shipping Address
     """
@@ -23,7 +23,7 @@ class ShippingAddress(ShippingAddress, extends=ShippingAddress):
         return res
 
 
-class ShippingAddressCreate(ShippingAddressCreate, extends=ShippingAddressCreate):
+class ShippingAddressNoteCreate(DeliveryAddressCreate, extends=DeliveryAddressCreate):
     """
     Creation of Shipping Address
     """
@@ -38,7 +38,7 @@ class ShippingAddressCreate(ShippingAddressCreate, extends=ShippingAddressCreate
         return vals
 
 
-class ShippingAddressUpdate(ShippingAddressUpdate, extends=ShippingAddressUpdate):
+class ShippingAddressNoteUpdate(DeliveryAddressUpdate, extends=DeliveryAddressUpdate):
     """
     Update of Shipping Address
     """
