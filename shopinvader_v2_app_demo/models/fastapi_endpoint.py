@@ -16,7 +16,10 @@ from odoo.addons.fastapi_auth_jwt.dependencies import (
 )
 from odoo.addons.shopinvader_api_address.routers.address_service import address_router
 from odoo.addons.shopinvader_api_cart.routers import cart_router
+from odoo.addons.shopinvader_api_payment.routers import payment_router
+from odoo.addons.shopinvader_api_sale.routers import sale_router
 from odoo.addons.shopinvader_api_sale_loyalty.routers import loyalty_router
+from odoo.addons.shopinvader_api_signin_jwt.routers import signin_router
 from odoo.addons.shopinvader_fastapi_auth_jwt.dependencies import (
     auth_jwt_authenticated_or_anonymous_partner,
     auth_jwt_authenticated_or_anonymous_partner_autocreate,
@@ -24,7 +27,6 @@ from odoo.addons.shopinvader_fastapi_auth_jwt.dependencies import (
 
 
 class FastapiEndpoint(models.Model):
-
     _inherit = "fastapi.endpoint"
 
     app: str = fields.Selection(
@@ -44,7 +46,13 @@ class FastapiEndpoint(models.Model):
             address_router.tags.append("address")
         if "loyalty" not in loyalty_router.tags:
             loyalty_router.tags.append("loyalty")
-        return [address_router, loyalty_router]
+        return [
+            address_router,
+            loyalty_router,
+            payment_router,
+            sale_router,
+            signin_router,
+        ]
 
     def _get_shopinvader_demo_tags(self, params) -> list:
         tags_metadata = params.get("openapi_tags", []) or []
