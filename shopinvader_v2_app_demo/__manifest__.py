@@ -36,6 +36,7 @@
         "shopinvader_product",
         "shopinvader_search_engine_image",
         "shopinvader_search_engine_product_brand_image",
+        "shopinvader_search_engine_product_price",
         "shopinvader_search_engine_product_stock_state",
         "shopinvader_search_engine_update_image",
         "shopinvader_search_engine_update_product_brand_image",
