@@ -27,8 +27,6 @@
         "shopinvader_product_brand_tag",
         "shopinvader_search_engine_product_brand_image",
         "connector_elasticsearch",
-        "shopinvader_restapi",
-        "shopinvader_restapi_auth_jwt",
         "sale_channel_search_engine_category",
         "sale_channel_search_engine_product",
     ],
@@ -46,11 +44,5 @@
         "demo/se_index.xml",
         "demo/se_image_field_thumbnail_size.xml",
         "demo/fs_storage.xml",
-        "demo/shopinvader_backend.xml",
     ],
-    "assets": {
-        "web.assets_frontend": [
-            "shopinvader_v2_app_demo/static/src/js/swagger_ui.js",
-        ],
-    },
 }
