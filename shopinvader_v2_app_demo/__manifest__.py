@@ -42,6 +42,7 @@
         "shopinvader_search_engine_update_product_brand_image",
         "shopinvader_search_engine_update_product_brand",
         "shopinvader_search_engine_update_product_media",
+        "shopinvader_search_engine_update_product_template_multi_link",
         "shopinvader_search_engine",
     ],
     "external_dependencies": {"python": ["fastapi"]},
