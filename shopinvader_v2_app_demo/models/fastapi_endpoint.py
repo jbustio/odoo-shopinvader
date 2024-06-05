@@ -17,6 +17,10 @@ from odoo.addons.fastapi_auth_jwt.dependencies import (
 from odoo.addons.shopinvader_api_address.routers.address_service import address_router
 from odoo.addons.shopinvader_api_cart.routers import cart_router
 from odoo.addons.shopinvader_api_customer.routers import customer_router
+from odoo.addons.shopinvader_api_delivery_carrier.routers import (
+    delivery_carrier_router,
+    delivery_router,
+)
 from odoo.addons.shopinvader_api_payment.routers import payment_router
 from odoo.addons.shopinvader_api_sale.routers import sale_router
 from odoo.addons.shopinvader_api_sale_loyalty.routers import loyalty_router
@@ -51,6 +55,8 @@ class FastapiEndpoint(models.Model):
         return [
             address_router,
             customer_router,
+            delivery_carrier_router,
+            delivery_router,
             loyalty_router,
             payment_router,
             sale_router,

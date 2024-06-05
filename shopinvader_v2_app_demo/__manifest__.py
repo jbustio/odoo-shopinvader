@@ -20,6 +20,7 @@
         "shopinvader_api_address",
         "shopinvader_api_cart",
         "shopinvader_api_customer",
+        "shopinvader_api_delivery_carrier",
         "shopinvader_api_payment_cart",
         "shopinvader_api_payment_provider_custom",
         "shopinvader_api_payment_provider_sips",
