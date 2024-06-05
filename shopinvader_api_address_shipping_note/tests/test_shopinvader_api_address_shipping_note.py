@@ -58,23 +58,25 @@ class TestShopinvaderApiAddressShippingNote(FastAPITransactionCase):
         context.extendable_registry.reset(cls.token)
         super().tearDownClass()
 
+    def _call_test_client(self, url, http_code=status.HTTP_200_OK, **kwargs):
+        method = kwargs.pop("method", "get")
+        with self._create_test_client(
+            router=self.default_fastapi_router
+        ) as test_client:
+            response: Response = getattr(test_client, method)(url, **kwargs)
+        self.assertEqual(
+            response.status_code,
+            http_code,
+            msg=f"error message: {response.text}",
+        )
+        return response.json()
+
     def test_get_shipping_address(self):
         """
         Test to get shipping address of authenticated_partner
         """
 
-        with self._create_test_client(router=address_router) as test_client:
-            response: Response = test_client.get(
-                "/addresses/delivery",
-            )
-
-        self.assertEqual(
-            response.status_code,
-            status.HTTP_200_OK,
-            msg=f"error message: {response.text}",
-        )
-
-        response_json = response.json()
+        response_json = self._call_test_client("/addresses/delivery")
         self.assertEqual(0, len(response_json))
 
         # add shipping address
@@ -91,18 +93,7 @@ class TestShopinvaderApiAddressShippingNote(FastAPITransactionCase):
             }
         )
 
-        with self._create_test_client(router=address_router) as test_client:
-            response: Response = test_client.get(
-                "/addresses/delivery",
-            )
-
-        self.assertEqual(
-            response.status_code,
-            status.HTTP_200_OK,
-            msg=f"error message: {response.text}",
-        )
-
-        response_json = response.json()
+        response_json = self._call_test_client("/addresses/delivery")
         self.assertTrue(response_json)
 
         address = response_json[0]
@@ -128,19 +119,32 @@ class TestShopinvaderApiAddressShippingNote(FastAPITransactionCase):
             "shipping_note": "test note",
         }
 
-        with self._create_test_client(router=address_router) as test_client:
-            response: Response = test_client.post(
-                "/addresses/delivery", content=json.dumps(data)
-            )
-
-        self.assertEqual(
-            response.status_code,
-            status.HTTP_201_CREATED,
-            msg=f"error message: {response.text}",
+        response_json = self._call_test_client(
+            "/addresses/delivery",
+            method="post",
+            http_code=status.HTTP_201_CREATED,
+            content=json.dumps(data),
         )
-        response_json = response.json()
         self.assertTrue(response_json)
 
         address = response_json
-
+        address_id = address.get("id")
         self.assertEqual(address.get("shipping_note"), "test note")
+
+        data = {
+            "shipping_note": "new test note",
+        }
+
+        address = self._call_test_client(
+            f"/addresses/delivery/{address_id}", method="post", content=json.dumps(data)
+        )
+        self.assertEqual(address.get("shipping_note"), "new test note")
+
+        data = {
+            "shipping_note": None,
+        }
+
+        address = self._call_test_client(
+            f"/addresses/delivery/{address_id}", method="post", content=json.dumps(data)
+        )
+        self.assertEqual(address.get("shipping_note"), None)

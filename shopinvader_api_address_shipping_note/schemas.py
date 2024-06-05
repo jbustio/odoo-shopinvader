@@ -8,7 +8,7 @@ from odoo.addons.shopinvader_api_address.schemas import (
 from odoo.addons.shopinvader_schema_address.schemas import DeliveryAddress
 
 
-class ShippingAddressNote(DeliveryAddress, extends=DeliveryAddress):
+class ShippingAddressNote(DeliveryAddress, extends=True):
     """
     Shipping Address
     """
@@ -23,7 +23,7 @@ class ShippingAddressNote(DeliveryAddress, extends=DeliveryAddress):
         return res
 
 
-class ShippingAddressNoteCreate(DeliveryAddressCreate, extends=DeliveryAddressCreate):
+class ShippingAddressNoteCreate(DeliveryAddressCreate, extends=True):
     """
     Creation of Shipping Address
     """
@@ -38,7 +38,7 @@ class ShippingAddressNoteCreate(DeliveryAddressCreate, extends=DeliveryAddressCr
         return vals
 
 
-class ShippingAddressNoteUpdate(DeliveryAddressUpdate, extends=DeliveryAddressUpdate):
+class ShippingAddressNoteUpdate(DeliveryAddressUpdate, extends=True):
     """
     Update of Shipping Address
     """
@@ -47,7 +47,8 @@ class ShippingAddressNoteUpdate(DeliveryAddressUpdate, extends=DeliveryAddressUp
 
     def to_res_partner_vals(self) -> dict:
         vals = super().to_res_partner_vals()
-        shipping_note = self.shipping_note
-        if shipping_note is not None:
-            vals["shipping_note"] = shipping_note
+        fname = "shipping_note"
+        values = self.model_dump(exclude_unset=True, include=[fname])
+        if fname in values:
+            vals[fname] = values[fname]
         return vals
