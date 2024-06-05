@@ -13,7 +13,7 @@ class ShippingAddressNote(DeliveryAddress, extends=DeliveryAddress):
     Shipping Address
     """
 
-    shipping_note: str | None
+    shipping_note: str | None = None
 
     @classmethod
     def from_res_partner(cls, odoo_rec):
@@ -28,7 +28,7 @@ class ShippingAddressNoteCreate(DeliveryAddressCreate, extends=DeliveryAddressCr
     Creation of Shipping Address
     """
 
-    shipping_note: str | None
+    shipping_note: str | None = None
 
     def to_res_partner_vals(self) -> dict:
         vals = super().to_res_partner_vals()
@@ -43,11 +43,11 @@ class ShippingAddressNoteUpdate(DeliveryAddressUpdate, extends=DeliveryAddressUp
     Update of Shipping Address
     """
 
-    shipping_note: str | None
+    shipping_note: str | None = None
 
     def to_res_partner_vals(self) -> dict:
         vals = super().to_res_partner_vals()
-
-        vals["shipping_note"] = self.shipping_note
-
+        shipping_note = self.shipping_note
+        if shipping_note is not None:
+            vals["shipping_note"] = shipping_note
         return vals
