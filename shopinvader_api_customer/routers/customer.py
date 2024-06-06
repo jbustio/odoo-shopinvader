@@ -56,16 +56,20 @@ class ShopInvaderApiCustomerHelper(models.AbstractModel):
 
     def _update_shopinvader_customer(self, data: CustomerUpdate) -> ResPartner:
         self.ensure_one()
-        values = CustomerUpdate.to_res_partner_vals(data)
-        lang_id = data.lang_id
-        if bool(lang_id):
-            values["lang"] = self.env["res.lang"].browse(lang_id).code
+        values = self._get_shopinvader_customer_values(data)
         partner = self.partner
         partner.write(values)
         self._handle_shopinvader_customer_opt_in(data)
         return partner
 
-    def _handle_shopinvader_customer_opt_in(self, data):
+    def _get_shopinvader_customer_values(self, data: CustomerUpdate) -> dict:
+        values = data.to_res_partner_vals()
+        lang_id = data.lang_id
+        if bool(lang_id):
+            values["lang"] = self.env["res.lang"].browse(lang_id).code
+        return values
+
+    def _handle_shopinvader_customer_opt_in(self, data: CustomerUpdate):
         self.ensure_one()
         opt_in = data.opt_in
         if opt_in is None:
