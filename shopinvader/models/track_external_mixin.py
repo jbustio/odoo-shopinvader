@@ -9,6 +9,7 @@ class TrackExternalMixin(models.AbstractModel):
 
     last_external_update_date = fields.Datetime()
 
+    @api.model
     def is_rest_request(self):
         return self.env.context.get("shopinvader_request", False)
 
@@ -28,4 +29,4 @@ class TrackExternalMixin(models.AbstractModel):
         new_vals = []
         for vals in values_list:
             new_vals.append(self._fill_last_external_update_date(vals))
-        return super().create(values_list)
+        return super().create(new_vals)
