@@ -16,7 +16,7 @@ def migrate(cr, version):
     with api.Environment.manage():
         env = api.Environment(cr, SUPERUSER_ID, {})
         domain = [("cart_expiry_delay", ">", 0)]
-        for backend in env.search(domain):
+        for backend in env["shopinvader.backend"].search(domain):
             backend = backend.with_company(backend.company_id.id).sudo_tech()
             expiry_date = fields.Datetime.from_string(fields.Datetime.now())
             delta_arg = {backend.cart_expiry_delay_unit: backend.cart_expiry_delay}
