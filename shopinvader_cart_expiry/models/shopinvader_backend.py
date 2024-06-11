@@ -35,7 +35,10 @@ class ShopinvaderBackend(models.Model):
         domain = expression.AND([domain, [("cart_expiry_delay", ">", 0)]])
         for backend in self.search(domain):
             description = _("Manage cart expired for backend %s") % backend.name
-            backend.with_delay(description=description).manage_cart_expiry()
+            backend.with_delay(
+                description=description,
+                identity_key="shopinvader_manage_cart_expiry_%s" % (str(backend.id),),
+            ).manage_cart_expiry()
 
     def _get_cart_expiry_delay_domain(self):
         expiry_date = fields.Datetime.from_string(fields.Datetime.now())
