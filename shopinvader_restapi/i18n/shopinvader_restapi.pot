@@ -212,6 +212,11 @@ msgid "Anonymous Token"
 msgstr ""
 
 #. module: shopinvader_restapi
+#: model:ir.model.fields,field_description:shopinvader_restapi.field_shopinvader_partner__applied_assortment_ids
+msgid "Applied Assortment"
+msgstr ""
+
+#. module: shopinvader_restapi
 #: model_terms:ir.ui.view,arch_db:shopinvader_restapi.shopinvader_partner_binding_form_view
 msgid "Apply"
 msgstr ""
