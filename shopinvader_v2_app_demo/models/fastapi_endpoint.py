@@ -24,7 +24,7 @@ from odoo.addons.shopinvader_api_delivery_carrier.routers import (
 )
 from odoo.addons.shopinvader_api_payment.routers import payment_router
 from odoo.addons.shopinvader_api_sale.routers import sale_router
-from odoo.addons.shopinvader_api_sale_loyalty.routers import sale_loyalty_cart_router
+#from odoo.addons.shopinvader_api_sale_loyalty.routers import sale_loyalty_cart_router
 from odoo.addons.shopinvader_api_settings.routers import settings_router
 from odoo.addons.shopinvader_api_signin_jwt.routers import signin_router
 from odoo.addons.shopinvader_fastapi_auth_jwt.dependencies import (
@@ -138,7 +138,7 @@ class FastapiEndpoint(models.Model):
             cart_app = FastAPI()
             cart_app.include_router(cart_router)
             cart_app.include_router(delivery_carrier_cart_router)
-            cart_app.include_router(sale_loyalty_cart_router)
+            #cart_app.include_router(sale_loyalty_cart_router)
             # First copy dependecies overrides from the main app
             cart_app.dependency_overrides.update(self._get_app_dependencies_overrides())
             # Then add/modify specific dependencies overrides
